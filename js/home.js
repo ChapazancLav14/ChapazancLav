@@ -11,7 +11,7 @@ let currentViewDate = new Date();
 // LOAD QUESTIONS
 // ===============================
 async function preloadQuestions() {
-  const res = await fetch("../data/questions.json");
+  const res = await fetch("data/questions.json");
   questionsCache = await res.json();
 }
 

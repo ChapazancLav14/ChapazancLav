@@ -139,7 +139,7 @@ async function saveCorrectAnswer(qId) {
 // 📚 LOAD QUESTIONS
 // ===============================
 async function loadQuestions() {
-  const res = await fetch("../data/questions.json");
+  const res = await fetch("data/questions.json");
   const data = await res.json();
 
   quiz = data;

@@ -20,7 +20,7 @@ window.goBack = function () {
   const lastPage = localStorage.getItem("lastPage");
 
   if (lastPage) {
-    window.location.href = "../pages/" + lastPage + ".html";
+    window.location.href = "pages/" + lastPage + ".html";
   } else {
     window.location.href = "home.html";
   }

@@ -81,7 +81,7 @@
   },
   {
     "id": 466,
-    "image": "../images/image.png",
+    "image": "images/image.png",
     "question": "Ո՞րն է աշխատանքի միավորը` արտահայտված ՄՀ-ի հիմնական միավորներով:",
     "answers": [
       {
@@ -130,7 +130,7 @@
   },
   {
     "id": 1689,
-    "image": "../images/image.png",
+    "image": "images/image.png",
     "question": "Ո՞րն է լույսի ուղղագիծ տարածման օրենքը:",
     "answers": [
       {
