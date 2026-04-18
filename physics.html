@@ -1,0 +1,227 @@
+<!--physics.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Main Page</title>
+  <link rel="icon" type="image/png" href="../images/icon.png">
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      /* 🔥 FIX: allows full scrolling */
+      min-height: 200vh;
+    }
+
+    /* 🔙 Back button */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #0f6d4d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .back-button:hover {
+      background-color: #0c5a3f;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
+
+      /* 🔥 EXTRA SPACE so last section reaches top */
+      padding-bottom: 400px;
+    }
+
+    /* 🔥 NAV */
+    .nav {
+      margin-top: 60px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      justify-content: center;
+    }
+
+    .nav button {
+      background: #ddd;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .nav button:hover {
+      background: #ccc;
+    }
+
+    /* 🔥 SECTION */
+    .section {
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    .section h1 {
+      margin-bottom: 5px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    /* Buttons */
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      margin-top: 50px; /* 🔥 ADD THIS */
+    }
+
+    .custom-button {
+      background-color: #0f6d4d;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 18px 20px;
+      font-size: 18px;
+
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      /* 🔥 FIX TEXT */
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .custom-button:hover {
+      background-color: #0c5a3f;
+    }
+
+    .custom-button span:first-child {
+      flex: 1;
+      word-break: break-word;      /* 🔥 allows wrapping */
+      overflow-wrap: anywhere;     /* 🔥 fixes long Armenian text */
+    }
+
+    .arrow {
+      font-size: 22px;
+      flex-shrink: 0;              /* 🔥 arrow stays fixed */
+    }
+
+    .custom-button:hover .arrow {
+      transform: translateX(5px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 🔙 Back -->
+  <button class="back-button" onclick="goBack()">←</button>
+
+  <div class="wrapper">
+
+    <!-- NAV -->
+    <div class="nav">
+      <button onclick="scrollToSection('section1')">Մեխանիկա</button>
+      <button onclick="scrollToSection('section2')">Մոլեկուլային Ֆիզիկա Եվ Ջերմադինամիկա</button>
+      <button onclick="scrollToSection('section3')">Էլեկտրադինամիկա</button>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div id="section1" class="section">
+      <h1>Մեխանիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page1.html')"><span>1․ ԿԻՆԵՄԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page2.html')"><span>2. ԴԻՆԱՄԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page3.html')"><span>3. ՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page4.html')"><span>4. ԱՇԽԱՏԱՆՔ, ՀԶՈՐՈՒԹՅՈՒՆ, ԷՆԵՐԳԻԱ։ ԻՄՊՈՒԼՍ։ ՊԱՀՊԱՆՄԱՆ ՕՐԵՆՔՆԵՐԸ ՄԵԽԱՆԻԿԱՅՈՒՄ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page5.html')"><span>5. ՀԻԴՐՈՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page6.html')"><span>6. ՄԵԽԱՆԻԿԱԿԱՆ ՏԱՏԱՆՈՒՄՆԵՐ ԵՎ ԱԼԻՔՆԵՐ</span><span class="arrow">›</span></button> 
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div id="section2" class="section">
+      <h1>Մոլեկուլային Ֆիզիկա Եվ Ջերմադինամիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page7.html')"><span>7. ՄՈԼԵԿՈՒԼԱՅԻՆ-ԿԻՆԵՏԻԿ ՏԵՍՈՒԹՅԱՆ ՀԻՄՈՒՆՔՆԵՐԸ: ԳԱԶԱՅԻՆ ՕՐԵՆՔՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page8.html')"><span>8. ՋԵՐՄԱԴԻՆԱՄԻԿԱՅԻ ՀԻՄՈՒՆՔՆԵՐԸ</span><span class="arrow">›</span></button>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div id="section3" class="section">
+      <h1>Էլեկտրադինամիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page9.html')"><span>9. ԷԼԵԿՏՐԱՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page10.html')"><span>10. ՀԱՍՏԱՏՈՒՆ ՀՈՍԱՆՔ: ՕՀՄԻ ՕՐԵՆՔԸ ՇՂԹԱՅԻ ՏԵՂԱՄԱՍԻ ՀԱՄԱՐ: ՀԱՂՈՐԴԻՉՆԵՐԻ ՀԱՋՈՐԴԱԿԱՆ ԵՎ ԶՈՒԳԱՀԵՌ ՄԻԱՑՈՒՄՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page11.html')"><span>11. ՄԱԳՆԻՍԱԿԱՆ ԴԱՇՏ: ԷԼԵԿՏՐԱՄԱԳՆԻՍԱԿԱՆ ՏԱՏԱՆՈՒՄՆԵՐ ԵՎ ԱԼԻՔՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page12.html')"><span>12. ՕՊՏԻԿԱ: ՀԱՐԱԲԵՐԱԿԱՆՈՒԹՅԱՆ ՀԱՏՈՒԿ ՏԵՍՈՒԹՅԱՆ ՏԱՐՐԵՐԸ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page13.html')"><span>13. ՔՎԱՆՏԱՅԻՆ ՖԻԶԻԿԱ</span><span class="arrow">›</span></button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "subjects.html";
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+
+      const offset = 20; // 🔥 small offset = top alignment
+      const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
+
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+      window.scrollTo({
+        top: Math.min(y, maxScroll),
+        behavior: "smooth"
+      });
+    }
+
+    function openPage(page) {
+      const pageName = page.split("/").pop().replace(".html", "");
+      localStorage.setItem("currentPage", pageName);
+
+      window.location.href = page;
+    }
+  </script>
+
+</body>
+</html>

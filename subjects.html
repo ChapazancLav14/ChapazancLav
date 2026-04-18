@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Select Mode</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #0f6d4d;
+  color: white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+/* BUTTON CONTAINER */
+.container {
+  width: 80%;
+  max-width: 500px;
+}
+
+/* BIG BUTTONS */
+.option-btn {
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  border: none;
+  font-size: 20px;
+  background: #0f6d4d;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.option-btn:hover {
+  background: #0c5a3f;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔙 FIXED BACK BUTTON -->
+<button class="back-btn" onclick="goBack()">←</button>
+
+<div class="container">
+  <button class="option-btn" onclick="goToNext('mode1')">
+    <span>Ֆիզիկա</span>
+    <span>›</span>
+  </button>
+
+  <button class="option-btn" onclick="goToNext('mode2')">
+    <span>Մաթեմատիկա</span>
+    <span>›</span>
+  </button>
+
+  <button class="option-btn" onclick="goToNext('mode3')">
+    <span>Հայոց Լեզու</span>
+    <span>›</span>
+  </button>
+</div>
+
+<script>
+// 🔙 ALWAYS GO HOME
+function goBack() {
+  window.location.href = "home.html";
+}
+
+function goToNext(mode) {
+  localStorage.setItem("selectedMode", mode);
+
+  if (mode === "mode1") {
+    window.location.href = "physics.html";
+  } else if (mode === "mode2") {
+    window.location.href = "math.html";
+  } else if (mode === "mode3") {
+    window.location.href = "language.html";
+  }
+}
+</script>
+
+</body>
+</html>

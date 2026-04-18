@@ -1,0 +1,200 @@
+<!--index.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<link rel="icon" href="../images/icon.png">
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 320px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #0f6d4d;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0c5a3f;
+}
+
+#error {
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+.success {
+  color: green;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Login / Register</h2>
+
+  <input type="email" id="email" placeholder="Enter email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button id="loginBtn">Login</button>
+  <button id="registerBtn">Register</button>
+  <button id="resendBtn">Resend Verification</button>
+
+  <div id="error"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyANzIW_EqzkHVDzpZaD41LkMHugULjsFFk",
+  authDomain: "quiz-app-e973d.firebaseapp.com",
+  projectId: "quiz-app-e973d",
+  storageBucket: "quiz-app-e973d.firebasestorage.app",
+  messagingSenderId: "14843518571",
+  appId: "1:14843518571:web:266c44f0a84001517c5b2e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const errorDiv = document.getElementById("error");
+
+onAuthStateChanged(auth, (user) => {
+  if (user && user.emailVerified) {
+    window.location.href = "home.html";
+  }
+});
+
+function isValidEmail(email) {
+  email = email.toLowerCase();
+  emailInput.value = email;
+
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!regex.test(email)) {
+    return { valid: false, message: "Invalid email format" };
+  }
+
+  const badGmail = ["gamil.com", "gmail.cmo", "gmial.com", "gmail.con"];
+
+  for (let bad of badGmail) {
+    if (email.endsWith("@" + bad)) {
+      return { valid: false, message: "Did you mean @gmail.com ?" };
+    }
+  }
+
+  return { valid: true };
+}
+
+document.getElementById("registerBtn").onclick = async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  errorDiv.className = "";
+  errorDiv.innerText = "";
+
+  const check = isValidEmail(email);
+
+  if (!check.valid) {
+    errorDiv.innerText = check.message;
+    return;
+  }
+
+  if (password.length < 6) {
+    errorDiv.innerText = "Password must be at least 6 characters";
+    return;
+  }
+
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(userCred.user);
+
+    errorDiv.className = "success";
+    errorDiv.innerText = "Verification email sent! Check your inbox.";
+  } catch (err) {
+    errorDiv.innerText = err.message;
+  }
+};
+
+document.getElementById("loginBtn").onclick = async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  errorDiv.className = "";
+  errorDiv.innerText = "";
+
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+    if (!userCred.user.emailVerified) {
+      errorDiv.innerText = "Please verify your email first.";
+      return;
+    }
+
+    window.location.href = "home.html";
+  } catch (err) {
+    errorDiv.innerText = err.message;
+  }
+};
+
+document.getElementById("resendBtn").onclick = async () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    errorDiv.innerText = "Login first to resend email.";
+    return;
+  }
+
+  try {
+    await sendEmailVerification(user);
+    errorDiv.className = "success";
+    errorDiv.innerText = "Verification email resent!";
+  } catch (err) {
+    errorDiv.innerText = err.message;
+  }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!--result.html-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Result</title>
+<link rel="icon" type="image/png" href="../images/icon.png">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<!-- 🔙 BACK -->
+<button class="back-btn" onclick="goBack()">←</button>
+
+<h1>Արդյունք</h1>
+
+<div class="result-box">
+  
+  <!-- 🎯 PERCENT CIRCLE -->
+  <div id="circle" class="circle">
+    <span id="percent">0%</span>
+  </div>
+
+  <!-- 📊 STATS -->
+  <div>
+    <p>Ժամանակ: <span id="time"></span></p>
+    <p>✅ Ճիշտ: <span id="correct"></span></p>
+    <p>❌ Սխալ: <span id="wrong"></span></p>
+  </div>
+
+</div>
+
+<!-- 🔢 ANSWER GRID -->
+<div id="grid" class="grid"></div>
+
+<!-- ✅ IMPORTANT: USE MODULE (NO COMPAT SCRIPTS) -->
+<script type="module" src="../js/result.js"></script>
+
+</body>
+</html>
