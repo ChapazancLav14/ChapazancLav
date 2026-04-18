@@ -1,3 +1,4 @@
+//home.js
 import { auth, db } from "./data.js";
 import { onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";

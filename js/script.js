@@ -157,9 +157,15 @@ async function loadQuestions() {
   }
 
   if (filteredQuiz.length === 0) {
-    document.body.innerHTML = "❌ No questions found";
+    document.body.innerHTML = `
+      <button class="back-btn" onclick="goBack()">←</button>
+
+      <div class="question-box">
+        <h2>❌ No questions found yet</h2>
+      </div>
+    `;
     return;
-  }
+}
 
   currentQuestion = 0;
   score = 0;
@@ -275,15 +281,44 @@ window.nextQuestion = function () {
 };
 
 // ===============================
-function endQuiz() {
+async function endQuiz() {
   const endTime = Date.now();
   const totalTime = Math.floor((endTime - startTime) / 1000);
 
   const currentPage = localStorage.getItem("currentPage");
+  const currentOption = localStorage.getItem("currentOption");
+
+  const percent = Math.round((score / filteredQuiz.length) * 100);
+
+  const user = auth.currentUser;
+
+  // 🔥 SAVE TO FIRESTORE
+  if (user && currentPage && currentOption) {
+    const ref = doc(db, "users", user.uid, "stats", currentPage);
+
+    try {
+      // OPTIONAL: prevent lower score overwrite
+      const snap = await getDoc(ref);
+      let prev = snap.exists()
+        ? snap.data()["option" + currentOption] || 0
+        : 0;
+
+      if (percent > prev) {
+        await setDoc(ref, {
+          ["option" + currentOption]: percent
+        }, { merge: true });
+      }
+    } catch (err) {
+      console.error("🔥 Error saving stats:", err);
+    }
+  }
+
+  // 🔁 SAVE LAST PAGE
   if (currentPage) {
     localStorage.setItem("lastPage", currentPage);
   }
 
+  // 📊 SAVE RESULT LOCALLY
   localStorage.setItem("quizResults", JSON.stringify({
     score,
     total: filteredQuiz.length,
@@ -291,6 +326,7 @@ function endQuiz() {
     time: totalTime
   }));
 
+  // 🚀 REDIRECT
   window.location.href = "result.html";
 }
 

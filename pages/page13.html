@@ -168,6 +168,9 @@ window.goBack = function () {
 window.openPage = function (option, startId, endId) {
   localStorage.setItem("currentOption", option);
 
+  // 🔥 ADD THIS LINE
+  localStorage.setItem("currentPage", "page13"); // change per file!
+
   localStorage.setItem("quizStart", startId);
   localStorage.setItem("quizEnd", endId);
 
