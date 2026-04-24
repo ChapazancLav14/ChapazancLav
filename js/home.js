@@ -24,23 +24,25 @@ async function preloadQuestions() {
 function calculateStreak(activeDays) {
   if (!activeDays.length) return 0;
 
+  const sorted = [...activeDays].sort();
+
+  // ✅ normalize today to midnight
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const dates = activeDays
-    .map(d => new Date(d))
-    .filter(d => d <= today)
-    .sort((a, b) => b - a);
+  let streak = 0;
 
-  if (!dates.length) return 0;
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const d = new Date(sorted[i]);
+    d.setHours(0, 0, 0, 0);
 
-  let streak = 1;
+    const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
 
-  for (let i = 0; i < dates.length - 1; i++) {
-    const diff =
-      (dates[i] - dates[i + 1]) / (1000 * 60 * 60 * 24);
-
-    if (diff === 1) streak++;
-    else break;
+    if (diff === streak) {
+      streak++;
+    } else {
+      break;
+    }
   }
 
   return streak;
@@ -55,7 +57,11 @@ function updateUserData(user) {
   onSnapshot(ref, async (snap) => {
     let data = snap.exists() ? snap.data() : {};
 
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+const todayStr =
+  now.getFullYear() + "-" +
+  String(now.getMonth() + 1).padStart(2, "0") + "-" +
+  String(now.getDate()).padStart(2, "0");
 
     let lastDate = data.lastActiveDate || null;
     let activeDays = data.activeDays || [];
@@ -77,6 +83,7 @@ function updateUserData(user) {
         lastActiveDate: lastDate,
         activeDays: activeDays
       }, { merge: true });
+      
     }
 
     const realStreak = calculateStreak(activeDays);
@@ -199,11 +206,19 @@ function updateStreakText(streak) {
 }
 
 // ===============================
-function updateCircle(answeredCorrectly) {
+function updateCircle(answeredCorrectly, answeredWrong = {}) {
   const total = questionsCache.length;
   if (!total) return;
 
-  const correctCount = Object.keys(answeredCorrectly).length;
+  const validIds = new Set(questionsCache.map(q => q.id));
+
+  const correctCount = Object.keys(answeredCorrectly)
+    .filter(id =>
+      validIds.has(Number(id)) &&
+      !answeredWrong[id] // 🚫 EXCLUDE partial
+    )
+    .length;
+
   const percent = Math.round((correctCount / total) * 100);
 
   const circle = document.getElementById("progress-circle");
@@ -228,16 +243,19 @@ onAuthStateChanged(auth, async (user) => {
 
   updateUserData(user);
 
-  onSnapshot(ref, (snap) => {
-    let answeredCorrectly = {};
+onSnapshot(ref, (snap) => {
+  let answeredCorrectly = {};
+  let answeredWrong = {};
 
-    if (snap.exists()) {
-      answeredCorrectly = snap.data().answeredCorrectly || {};
-    }
+  if (snap.exists()) {
+    answeredCorrectly = snap.data().answeredCorrectly || {};
+    answeredWrong = snap.data().answeredWrong || {};
+  }
 
-    updateCircle(answeredCorrectly);
-  });
+  updateCircle(answeredCorrectly, answeredWrong);
 });
+
+}); // ✅ THIS WAS MISSING
 
 // ===============================
 window.resetProgress = async function () {
@@ -247,8 +265,12 @@ window.resetProgress = async function () {
   const ref = doc(db, "users", user.uid);
 
   await setDoc(ref, {
-    answeredCorrectly: {}
+    answeredCorrectly: {},
+    answeredWrong: {}
   }, { merge: true });
+
+  // ✅ FORCE CLEAN STATE
+  location.reload();
 };
 
 // ===============================

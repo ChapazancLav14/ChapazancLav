@@ -1,108 +1,131 @@
-//script.js
-import { auth, db } from "./data.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+  //script.js
+  import { auth, db } from "./data.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+  import {
+    doc,
+    getDoc,
+    setDoc,
+  } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-console.log("🚀 script loaded");
+  console.log("🚀 script loaded");
 
-// ===============================
-// QUIZ DATA
-// ===============================
-let quiz = [];
-let filteredQuiz = [];
-let currentQuestion = 0;
-let score = 0;
-let answeredCount = 0;
+  // ===============================
+  // QUIZ DATA
+  // ===============================
+  let quiz = [];
+  let filteredQuiz = [];
+  let currentQuestion = 0;
+  let score = 0;
+  let answeredCount = 0;
 
-// RESULT DATA
-let userAnswers = [];
-let startTime = Date.now();
+  // RESULT DATA
+  let userAnswers = [];
+  let startTime = Date.now();
 
-// USER DATA
-let answeredCorrectly = {};
+  // USER DATA
+  let answeredCorrectly = {};
+  let answeredWrong = {};
 
-// ===============================
-// 🔥 LOAD
-// ===============================
-loadQuestions();
+  // ===============================
+  // 🔥 LOAD
+  // ===============================
+  loadQuestions();
 
-// ===============================
-// 🔐 AUTH
-// ===============================
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    await loadUserProgress();
+  // ===============================
+  // 🔐 AUTH
+  // ===============================
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await loadUserProgress();
 
-    // 🔥 DAY TRACK
-    updateDayTrack();
-  }
-});
+      // 🔥 DAY TRACK
+      updateDayTrack();
+    }
+  });
 
-// ===============================
-// 🔥 DAY TRACK (BOX VERSION)
-// ===============================
-function updateDayTrack() {
+  // ===============================
+  // 🔥 DAY TRACK (BOX VERSION)
+  // ===============================
+async function updateDayTrack() {
   const today = new Date();
 
-  const todayStr = today.toISOString().slice(0, 10);
+  // ✅ LOCAL DATE (no timezone bugs)
+  const todayStr =
+    today.getFullYear() + "-" +
+    String(today.getMonth() + 1).padStart(2, "0") + "-" +
+    String(today.getDate()).padStart(2, "0");
+
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
   ];
 
-  let stored = JSON.parse(localStorage.getItem("dayTrack")) || {
-    lastDate: null,
-    streak: 0,
-    month: currentMonth,
-    year: currentYear,
-  };
+  const user = auth.currentUser;
+  if (!user) return;
 
-  // RESET MONTH
-  if (stored.month !== currentMonth || stored.year !== currentYear) {
-    stored.streak = 0;
-    stored.month = currentMonth;
-    stored.year = currentYear;
+  const ref = doc(db, "users", user.uid);
+
+  let activeDays = [];
+
+  try {
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+
+    activeDays = data.activeDays || [];
+
+    // ✅ ADD TODAY IF NOT EXISTS
+    if (!activeDays.includes(todayStr)) {
+      activeDays.push(todayStr);
+
+      await setDoc(ref, {
+        activeDays: activeDays,
+        lastActiveDate: todayStr
+      }, { merge: true });
+    }
+
+  } catch (err) {
+    console.error("🔥 DayTrack Firestore error:", err);
+    return;
   }
 
-  // NEW DAY
-  if (stored.lastDate !== todayStr) {
-    stored.streak += 1;
-    stored.lastDate = todayStr;
+  // ===============================
+  // 🔥 CALCULATE STREAK (FROM FIRESTORE)
+  // ===============================
+  const streak = calculateStreak(activeDays);
 
-    localStorage.setItem("dayTrack", JSON.stringify(stored));
+  const streakEl = document.getElementById("streak");
+  if (streakEl) {
+    streakEl.innerText = "🔥 Day " + streak;
   }
 
-  // 🔥 SET MONTH NAME
-  document.getElementById("month-label").innerText = monthNames[currentMonth];
+  // ===============================
+  // 🔥 UI (calendar)
+  // ===============================
+  const monthLabel = document.getElementById("month-label");
+  const container = document.getElementById("day-boxes");
 
-  // 🔥 BOXES
+  if (!monthLabel || !container) return;
+
+  monthLabel.innerText = monthNames[currentMonth];
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  const container = document.getElementById("day-boxes");
   container.innerHTML = "";
 
-  for (let i = 0; i < daysInMonth; i++) {
+  for (let i = 1; i <= daysInMonth; i++) {
     const box = document.createElement("div");
     box.className = "day-box";
+    box.innerText = i;
 
-    if (i < stored.streak) {
+    const dateStr =
+      currentYear + "-" +
+      String(currentMonth + 1).padStart(2, "0") + "-" +
+      String(i).padStart(2, "0");
+
+    if (activeDays.includes(dateStr)) {
       box.classList.add("active");
     }
 
@@ -110,446 +133,476 @@ function updateDayTrack() {
   }
 }
 
-// ===============================
-// LOAD USER PROGRESS
-// ===============================
-async function loadUserProgress() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    answeredCorrectly = snap.data().answeredCorrectly || {};
-  }
-}
-
-// ===============================
-// SAVE CORRECT ANSWER
-// ===============================
-async function saveCorrectAnswer(qId) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  if (!answeredCorrectly[qId]) {
-    answeredCorrectly[qId] = true;
+  // ===============================
+  // LOAD USER PROGRESS
+  // ===============================
+  async function loadUserProgress() {
+    const user = auth.currentUser;
+    if (!user) return;
 
     const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
 
-await setDoc(
-  ref,
-  {
-    answeredCorrectly: answeredCorrectly,
-  },
-  { merge: true },
-);
-  }
-}
-
-// ===============================
-// 📚 LOAD QUESTIONS
-// ===============================
-async function loadQuestions() {
-  const res = await fetch("data/questions.csv");
-  const text = await res.text();
-
-  quiz = parseCSV(text);
-
-  const start = Number(localStorage.getItem("quizStart"));
-  const end = Number(localStorage.getItem("quizEnd"));
-
-  console.log("🔥 RANGE:", start, end);
-
-  if (!isNaN(start) && !isNaN(end)) {
-    filteredQuiz = quiz.filter((q) => q.id >= start && q.id <= end);
-  } else {
-    document.body.innerHTML = "❌ Missing quiz range";
-    return;
+    if (snap.exists()) {
+      answeredCorrectly = snap.data().answeredCorrectly || {};
+      answeredWrong = snap.data().answeredWrong || {};
+    }
   }
 
-  if (filteredQuiz.length === 0) {
-    document.body.innerHTML = `
-      <button class="back-btn" onclick="goBack()">←</button>
+  // ===============================
+  // SAVE CORRECT ANSWER
+  // ===============================
+  async function saveCorrectAnswer(qId) {
+    const user = auth.currentUser;
+    if (!user) return;
 
-      <div class="question-box">
-        <h2>❌ No questions found yet</h2>
-      </div>
-    `;
-    return;
+    if (!answeredCorrectly[qId]) {
+      answeredCorrectly[qId] = true;
+
+      const ref = doc(db, "users", user.uid);
+
+  await setDoc(
+    ref,
+    {
+      answeredCorrectly: answeredCorrectly,
+    },
+    { merge: true },
+  );
+    }
   }
 
-  const input = document.getElementById("jumpInput");
-  const error = document.getElementById("jumpError");
+  // ===============================
+  // 📚 LOAD QUESTIONS
+  // ===============================
+  async function loadQuestions() {
+    const res = await fetch("data/questions.csv");
+    const text = await res.text();
 
-  if (input) {
-    input.min = 1;
-    input.max = filteredQuiz.length;
+    quiz = parseCSV(text);
 
-    // ✅ clear error when typing
-    input.addEventListener("input", () => {
-      error.innerText = "";
-      input.classList.remove("input-error");
+    const start = Number(localStorage.getItem("quizStart"));
+    const end = Number(localStorage.getItem("quizEnd"));
 
-      if (input.value === "") return;
+    console.log("🔥 RANGE:", start, end);
 
-      let value = Number(input.value);
+    if (!isNaN(start) && !isNaN(end)) {
+      filteredQuiz = quiz.filter((q) => q.id >= start && q.id <= end);
+    } else {
+      document.body.innerHTML = "❌ Missing quiz range";
+      return;
+    }
 
-      if (value < 1) input.value = 1;
-      if (value > filteredQuiz.length) input.value = filteredQuiz.length;
-    });
+    if (filteredQuiz.length === 0) {
+      document.body.innerHTML = `
+        <button class="back-btn" onclick="goBack()">←</button>
 
-    // ✅ press Enter = Go
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        window.jumpToQuestion();
-      }
-    });
+        <div class="question-box">
+          <h2>❌ No questions found yet</h2>
+        </div>
+      `;
+      return;
+    }
 
-    // ✅ clear error when clicking outside
-    document.addEventListener("click", (e) => {
-      if (e.target !== input) {
+    const input = document.getElementById("jumpInput");
+    const error = document.getElementById("jumpError");
+
+    if (input) {
+      input.min = 1;
+      input.max = filteredQuiz.length;
+
+      // ✅ clear error when typing
+      input.addEventListener("input", () => {
         error.innerText = "";
         input.classList.remove("input-error");
-      }
+
+        if (input.value === "") return;
+
+        let value = Number(input.value);
+
+        if (value < 1) input.value = 1;
+        if (value > filteredQuiz.length) input.value = filteredQuiz.length;
+      });
+
+      // ✅ press Enter = Go
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          window.jumpToQuestion();
+        }
+      });
+
+      // ✅ clear error when clicking outside
+      document.addEventListener("click", (e) => {
+        if (e.target !== input) {
+          error.innerText = "";
+          input.classList.remove("input-error");
+        }
+      });
+    }
+
+    // 🔥 reset quiz state
+    currentQuestion = 0;
+    score = 0;
+    answeredCount = 0;
+    userAnswers = [];
+    startTime = Date.now();
+
+    // 🔥 initial load
+    loadQuestion();
+    updateProgress();
+  }
+
+  // ===============================
+  // 🔥 LOAD QUESTION
+  // ===============================
+  function loadQuestion() {
+    const input = document.getElementById("jumpInput");
+    if (input) {
+      input.value = "";
+      input.placeholder = `1 - ${filteredQuiz.length}`;
+    }
+    const q = filteredQuiz[currentQuestion];
+
+    if (!q) {
+      endQuiz();
+      return;
+    }
+
+    document.getElementById("question").innerText = q.question;
+
+    const imageContainer = document.getElementById("image-container");
+    imageContainer.innerHTML = "";
+
+    if (q.image) {
+      const img = document.createElement("img");
+      img.src = q.image;
+      img.className = "question-image";
+      imageContainer.appendChild(img);
+    }
+
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+
+    if (q.answers.length === 4) {
+      answersDiv.style.gridAutoFlow = "column";
+      answersDiv.style.gridTemplateRows = "repeat(2, auto)";
+    } else {
+      answersDiv.style.gridAutoFlow = "row";
+    }
+
+    q.answers.forEach((ans, index) => {
+      const btn = document.createElement("button");
+      btn.className = "answer";
+      btn.innerText = index + 1 + ". " + ans.text;
+
+      btn.onclick = () => checkAnswer(btn, index);
+
+      answersDiv.appendChild(btn);
     });
   }
 
-  // 🔥 reset quiz state
-  currentQuestion = 0;
-  score = 0;
-  answeredCount = 0;
-  userAnswers = [];
-  startTime = Date.now();
+  // ===============================
+  // CHECK ANSWER
+  // ===============================
+  async function checkAnswer(btn, index) {
+    const all = document.querySelectorAll(".answer");
+    all.forEach((b) => (b.disabled = true));
 
-  // 🔥 initial load
-  loadQuestion();
-  updateProgress();
-}
+    const feedback = document.getElementById("feedback");
+    const title = document.getElementById("feedback-title");
+    const text = document.getElementById("feedback-text");
 
-// ===============================
-// 🔥 LOAD QUESTION
-// ===============================
-function loadQuestion() {
-  const input = document.getElementById("jumpInput");
-  if (input) {
-    input.value = "";
-    input.placeholder = `1 - ${filteredQuiz.length}`;
+    const currentQ = filteredQuiz[currentQuestion];
+    const correctIndex = currentQ.answers.findIndex((a) => a.correct);
+
+   all.forEach((b, i) => {
+  if (i === correctIndex) {
+    b.classList.add("correct");
+  } else if (i === index) {
+    b.classList.add("wrong"); // 🔥 THIS WAS MISSING
   }
-  const q = filteredQuiz[currentQuestion];
+});
 
-  if (!q) {
-    endQuiz();
-    return;
-  }
+    const isCorrect = index === correctIndex;
 
-  document.getElementById("question").innerText = q.question;
+    if (!userAnswers[currentQuestion]) {
+      userAnswers[currentQuestion] = {
+        question: currentQ,
+        attempts: [],
+      };
+    }
 
-  const imageContainer = document.getElementById("image-container");
-  imageContainer.innerHTML = "";
-
-  if (q.image) {
-    const img = document.createElement("img");
-    img.src = q.image;
-    img.className = "question-image";
-    imageContainer.appendChild(img);
-  }
-
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = "";
-
-  if (q.answers.length === 4) {
-    answersDiv.style.gridAutoFlow = "column";
-    answersDiv.style.gridTemplateRows = "repeat(2, auto)";
-  } else {
-    answersDiv.style.gridAutoFlow = "row";
-  }
-
-  q.answers.forEach((ans, index) => {
-    const btn = document.createElement("button");
-    btn.className = "answer";
-    btn.innerText = index + 1 + ". " + ans.text;
-
-    btn.onclick = () => checkAnswer(btn, index);
-
-    answersDiv.appendChild(btn);
-  });
-}
-
-// ===============================
-// CHECK ANSWER
-// ===============================
-function checkAnswer(btn, index) {
-  const all = document.querySelectorAll(".answer");
-  all.forEach((b) => (b.disabled = true));
-
-  const feedback = document.getElementById("feedback");
-  const title = document.getElementById("feedback-title");
-  const text = document.getElementById("feedback-text");
-
-  const currentQ = filteredQuiz[currentQuestion];
-  const correctIndex = currentQ.answers.findIndex((a) => a.correct);
-
-  all.forEach((b, i) => {
-    if (i === correctIndex) b.classList.add("correct");
-  });
-
-  const isCorrect = index === correctIndex;
-
-  if (!userAnswers[currentQuestion]) {
-    userAnswers[currentQuestion] = {
-      question: currentQ,
-      attempts: [],
-    };
-  }
-
-  userAnswers[currentQuestion].attempts.push({
-    selectedIndex: index,
-    correctIndex,
-    isCorrect,
-  });
+    userAnswers[currentQuestion].attempts.push({
+      selectedIndex: index,
+      correctIndex,
+      isCorrect,
+    });
 
   if (isCorrect) {
-    saveCorrectAnswer(currentQ.id);
-    title.innerText = "Ճիշտ է";
-    text.innerText = "Դուք ճիշտ պատասխանեցիք";
-    feedback.className = "feedback correct-bg show";
+    // ✅ ONLY save if NEVER wrong before
+    if (!answeredWrong[currentQ.id]) {
+      saveCorrectAnswer(currentQ.id);
+    }
   } else {
-    btn.classList.add("wrong");
+    // ❌ mark as wrong forever
+    answeredWrong[currentQ.id] = true;
 
-    title.innerText = "Սխալ է";
-    text.innerText = "Ճիշտ պատասխանը նշված է կանաչով";
-    feedback.className = "feedback wrong-bg show";
+    // 🚫 also REMOVE from correct if it was saved before
+    delete answeredCorrectly[currentQ.id];
+
+    // 🔥 update DB immediately
+    const user = auth.currentUser;
+    if (user) {
+      const ref = doc(db, "users", user.uid);
+
+      await setDoc(ref, {
+    answeredCorrectly: answeredCorrectly,
+    answeredWrong: answeredWrong // ✅ ADD THIS
+  }, { merge: true });
+    }
   }
+if (isCorrect) {
+  title.innerText = "✅ Correct";
+  text.innerText = "";
 
-  answeredCount = userAnswers.filter((a) => a).length;
+  feedback.classList.add("correct-bg");
+  feedback.classList.remove("wrong-bg");
+} else {
+  title.innerText = "❌ Wrong";
+  text.innerText = "";
 
-  saveLiveProgress();
+  feedback.classList.add("wrong-bg");
+  feedback.classList.remove("correct-bg");
 }
 
-// ===============================
-window.nextQuestion = function () {
-  document.getElementById("feedback").classList.remove("show");
+    answeredCount = userAnswers.filter((a) => a).length;
+    feedback.classList.add("show");
 
-  currentQuestion++;
-
-  // 🔥 UPDATE HERE (right after moving)
-  updateProgress();
-
-  if (currentQuestion < filteredQuiz.length) {
-    setTimeout(loadQuestion, 300);
-  } else {
-    endQuiz();
+    saveLiveProgress();
   }
-};
 
-// ===============================
-async function endQuiz() {
-  try{
-  const endTime = Date.now();
-  const totalTime = Math.floor((endTime - startTime) / 1000);
+  // ===============================
+  window.nextQuestion = function () {
+    document.getElementById("feedback").classList.remove("show");
 
-  const currentPage = localStorage.getItem("currentPage");
-  const currentOption = localStorage.getItem("currentOption");
+    currentQuestion++;
 
-  const user = auth.currentUser;
+    // 🔥 UPDATE HERE (right after moving)
+    updateProgress();
 
-  // ✅ COUNT CORRECT QUESTIONS FROM DATABASE (not session)
-  const correctCount = filteredQuiz.filter(
-    (q) => answeredCorrectly[q.id],
+    if (currentQuestion < filteredQuiz.length) {
+      setTimeout(loadQuestion, 300);
+    } else {
+      endQuiz();
+    }
+  };
+
+  // ===============================
+  async function endQuiz() {
+    try{
+    const endTime = Date.now();
+    const totalTime = Math.floor((endTime - startTime) / 1000);
+
+    const currentPage = localStorage.getItem("currentPage");
+    const currentOption = localStorage.getItem("currentOption");
+
+    const user = auth.currentUser;
+
+    // ✅ COUNT CORRECT QUESTIONS FROM DATABASE (not session)
+  let correctCount = 0;
+
+  userAnswers.forEach((q) => {
+    if (!q || !q.attempts) return;
+
+    const hasCorrect = q.attempts.some(a => a.isCorrect);
+    if (hasCorrect) correctCount++;
+  });
+
+  const percent = Math.round((correctCount / filteredQuiz.length) * 100);
+    // ===============================
+    // 🔥 SAVE GLOBAL PROGRESS (HOME %)
+    // ===============================
+
+
+    // ===============================
+    // 🔥 SAVE PAGE PROGRESS (circles)
+    // ===============================
+    if (user && currentPage && currentOption) {
+      const ref = doc(db, "users", user.uid, "stats", currentPage);
+
+      try {
+        const snap = await getDoc(ref);
+        let prev = snap.exists() ? snap.data()["option" + currentOption] || 0 : 0;
+
+        if (percent > prev) {
+          await setDoc(
+            ref,
+            {
+              ["option" + currentOption]: percent,
+            },
+            { merge: true },
+          );
+        }
+      } catch (err) {
+        console.error("🔥 Error saving stats:", err);
+      }
+    }
+
+    // ===============================
+    // SAVE RESULT
+    // ===============================
+    if (currentPage) {
+      localStorage.setItem("lastPage", currentPage);
+    }
+
+  let sessionCorrect = 0;
+
+  userAnswers.forEach((q) => {
+    if (!q || !q.attempts) return;
+
+    // ✅ ONLY count if FIRST attempt is correct
+    if (q.attempts[0]?.isCorrect) {
+      sessionCorrect++;
+    }
+  });
+
+  const sessionPercent = filteredQuiz.length === 0
+    ? 0
+    : Math.round((sessionCorrect / filteredQuiz.length) * 100);
+
+  localStorage.setItem(
+    "quizResults",
+    JSON.stringify({
+      score,
+      total: filteredQuiz.length,
+      answers: userAnswers,
+      time: totalTime,
+      answered: answeredCount,
+      percent: sessionPercent // ✅ ADD THIS LINE
+    }),
+  );
+
+    }
+    catch (err) {
+      console.error("🔥 endQuiz error:", err);
+    }
+    window.location.href = "result.html";
+
+  }
+
+  async function saveLiveProgress() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const currentPage = localStorage.getItem("currentPage");
+    const currentOption = localStorage.getItem("currentOption");
+
+    if (!currentPage || !currentOption) return;
+
+    const correctCount = filteredQuiz.filter(
+    (q) => answeredCorrectly[q.id]
   ).length;
 
   const percent = Math.round((correctCount / filteredQuiz.length) * 100);
-  // ===============================
-  // 🔥 SAVE GLOBAL PROGRESS (HOME %)
-  // ===============================
 
-
-  // ===============================
-  // 🔥 SAVE PAGE PROGRESS (circles)
-  // ===============================
-  if (user && currentPage && currentOption) {
     const ref = doc(db, "users", user.uid, "stats", currentPage);
 
     try {
       const snap = await getDoc(ref);
       let prev = snap.exists() ? snap.data()["option" + currentOption] || 0 : 0;
 
-      if (percent > prev) {
-        await setDoc(
-          ref,
-          {
-            ["option" + currentOption]: percent,
-          },
-          { merge: true },
-        );
-      }
+
     } catch (err) {
-      console.error("🔥 Error saving stats:", err);
+      console.error("🔥 Live save error:", err);
     }
   }
 
   // ===============================
-  // SAVE RESULT
+  function updateProgress() {
+    const total = filteredQuiz.length;
+
+    // 🔥 show current question (starts from 1)
+    const current = Math.min(currentQuestion + 1, total);
+
+    const percent = total ? (current / total) * 100 : 0;
+
+    document.getElementById("progress-bar").style.width = percent + "%";
+    document.getElementById("progress-text").innerText = current + "/" + total;
+  }
+
   // ===============================
-  if (currentPage) {
-    localStorage.setItem("lastPage", currentPage);
+  window.goBack = function () {
+    window.history.back();
+  };
+
+  function fixText(text) {
+    if (!text) return text;
+
+    return text
+      .replace(/ш/g, "ա")
+      .replace(/р/g, "բ")
+      .replace(/q/g, "գ")
+      .replace(/η/g, "դ");
   }
 
-    let sessionCorrect = 0;
-let sessionAnswered = 0;
+  function parseCSV(text) {
+    const lines = text.trim().split("\n");
 
-userAnswers.forEach((q) => {
-  if (!q || !q.attempts) return;
+    return lines.slice(1).map((line) => {
+      const [id, question, a, b, c, d, correct, image] = line.split(";");
 
-  sessionAnswered++;
-
-  const hasCorrect = q.attempts.some(a => a.isCorrect);
-  const hasWrong = q.attempts.some(a => !a.isCorrect);
-
-  if (hasCorrect && !hasWrong) {
-    sessionCorrect++;
-  }
-});
-
-const sessionPercent = sessionAnswered === 0
-  ? 0
-  : Math.round((sessionCorrect / sessionAnswered) * 100);
-
-localStorage.setItem(
-  "quizResults",
-  JSON.stringify({
-    score,
-    total: filteredQuiz.length,
-    answers: userAnswers,
-    time: totalTime,
-    answered: answeredCount,
-    percent: sessionPercent // ✅ ADD THIS LINE
-  }),
-);
-
-  }
-  catch (err) {
-    console.error("🔥 endQuiz error:", err);
-  }
-  window.location.href = "result.html";
-
-}
-
-async function saveLiveProgress() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const currentPage = localStorage.getItem("currentPage");
-  const currentOption = localStorage.getItem("currentOption");
-
-  if (!currentPage || !currentOption) return;
-
-  const correctCount = filteredQuiz.filter(
-  (q) => answeredCorrectly[q.id]
-).length;
-
-const percent = Math.round((correctCount / filteredQuiz.length) * 100);
-
-  const ref = doc(db, "users", user.uid, "stats", currentPage);
-
-  try {
-    const snap = await getDoc(ref);
-    let prev = snap.exists() ? snap.data()["option" + currentOption] || 0 : 0;
-
-
-  } catch (err) {
-    console.error("🔥 Live save error:", err);
-  }
-}
-
-// ===============================
-function updateProgress() {
-  const total = filteredQuiz.length;
-
-  // 🔥 show current question (starts from 1)
-  const current = Math.min(currentQuestion + 1, total);
-
-  const percent = total ? (current / total) * 100 : 0;
-
-  document.getElementById("progress-bar").style.width = percent + "%";
-  document.getElementById("progress-text").innerText = current + "/" + total;
-}
-
-// ===============================
-window.goBack = function () {
-  window.history.back();
-};
-
-function fixText(text) {
-  if (!text) return text;
-
-  return text
-    .replace(/ш/g, "ա")
-    .replace(/р/g, "բ")
-    .replace(/q/g, "գ")
-    .replace(/η/g, "դ");
-}
-
-function parseCSV(text) {
-  const lines = text.trim().split("\n");
-
-  return lines.slice(1).map((line) => {
-    const [id, question, a, b, c, d, correct, image] = line.split(";");
-
-    return {
-      id: Number(id),
-      ...(image ? { image: image.trim() } : {}),
-      question: fixText(question.trim()),
-      answers: [
-        { text: fixText(a.trim()), correct: correct == 1 },
-        { text: fixText(b.trim()), correct: correct == 2 },
-        { text: fixText(c.trim()), correct: correct == 3 },
-        { text: fixText(d.trim()), correct: correct == 4 },
-      ],
-    };
-  });
-}
-
-window.jumpToQuestion = function () {
-  const input = document.getElementById("jumpInput");
-  const error = document.getElementById("jumpError");
-
-  error.innerText = "";
-  input.classList.remove("input-error");
-
-  if (!input.value) {
-    error.innerText = "Please enter a question number";
-    input.classList.add("input-error");
-    return;
+      return {
+        id: Number(id),
+        ...(image ? { image: image.trim() } : {}),
+        question: fixText(question.trim()),
+        answers: [
+          { text: fixText(a.trim()), correct: correct == 1 },
+          { text: fixText(b.trim()), correct: correct == 2 },
+          { text: fixText(c.trim()), correct: correct == 3 },
+          { text: fixText(d.trim()), correct: correct == 4 },
+        ],
+      };
+    });
   }
 
-  let value = Number(input.value);
+  window.jumpToQuestion = function () {
+    const input = document.getElementById("jumpInput");
+    const error = document.getElementById("jumpError");
 
-  if (value < 1 || value > filteredQuiz.length) {
-    error.innerText = `Enter 1 - ${filteredQuiz.length}`;
-    input.classList.add("input-error");
-    return;
+    error.innerText = "";
+    input.classList.remove("input-error");
+
+    if (!input.value) {
+      error.innerText = "Please enter a question number";
+      input.classList.add("input-error");
+      return;
+    }
+
+    let value = Number(input.value);
+
+    if (value < 1 || value > filteredQuiz.length) {
+      error.innerText = `Enter 1 - ${filteredQuiz.length}`;
+      input.classList.add("input-error");
+      return;
+    }
+
+    // ✅ SET QUESTION
+    currentQuestion = value - 1;
+
+    // ✅ LOAD IT
+    loadQuestion();
+
+    // 🔥 THIS IS WHAT YOU WERE MISSING
+    updateProgress();
+  };
+
+  function getQuestionStatus(qData) {
+    if (!qData || !qData.attempts) return "unanswered";
+
+    const hasCorrect = qData.attempts.some((a) => a.isCorrect);
+    const hasWrong = qData.attempts.some((a) => !a.isCorrect);
+
+    if (hasCorrect && hasWrong) return "partial"; // 🔥 Թերի
+    if (hasCorrect) return "correct";
+    return "wrong";
   }
-
-  // ✅ SET QUESTION
-  currentQuestion = value - 1;
-
-  // ✅ LOAD IT
-  loadQuestion();
-
-  // 🔥 THIS IS WHAT YOU WERE MISSING
-  updateProgress();
-};
-
-function getQuestionStatus(qData) {
-  if (!qData || !qData.attempts) return "unanswered";
-
-  const hasCorrect = qData.attempts.some((a) => a.isCorrect);
-  const hasWrong = qData.attempts.some((a) => !a.isCorrect);
-
-  if (hasCorrect && hasWrong) return "partial"; // 🔥 Թերի
-  if (hasCorrect) return "correct";
-  return "wrong";
-}

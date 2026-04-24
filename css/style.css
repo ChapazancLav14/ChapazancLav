@@ -110,19 +110,22 @@ body {
   width: 100%;
   color: white;
   transition: 0.4s;
-  padding: 20px;
+  padding: 25px;
+  text-align: center;
 }
 
 .feedback button {
   margin-top: 15px;
-  width: 100%;
-  padding: 18px;
-  border-radius: 25px;
+  padding: 16px 30px;
+  border-radius: 30px;
   border: none;
   cursor: pointer;
   font-size: 20px;
+  background: white;
+  color: #333;
+  font-weight: bold;
+  width: auto;
 }
-
 .show {
   bottom: 0;
 }

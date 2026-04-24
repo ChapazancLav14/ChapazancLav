@@ -32,14 +32,7 @@ window.goBack = function () {
 // ===============================
 // 📊 CALCULATE %
 // ===============================
-let percent = 0;
-
-if (resultData.total > 0) {
-  percent = Math.round((resultData.score / resultData.total) * 100);
-}
-
-if (isNaN(percent) || percent < 0) percent = 0;
-if (percent > 100) percent = 100;
+const percent = resultData.percent ?? 0;
 
 // ===============================
 // 🔥 SAVE TO FIREBASE
