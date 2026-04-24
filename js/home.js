@@ -12,8 +12,10 @@ let currentViewDate = new Date();
 // LOAD QUESTIONS
 // ===============================
 async function preloadQuestions() {
-  const res = await fetch("data/questions.json");
-  questionsCache = await res.json();
+  const res = await fetch("data/questions.csv");
+  const text = await res.text();
+
+  questionsCache = parseCSV(text);
 }
 
 // ===============================
@@ -255,3 +257,36 @@ window.logout = function () {
     window.location.href = "index.html";
   });
 };
+
+function fixText(text) {
+  if (!text) return text;
+
+  return text
+    .replace(/ш/g, "ա")
+    .replace(/Ш/g, "ա")
+    .replace(/р/g, "բ")
+    .replace(/Р/g, "բ")
+    .replace(/q/g, "գ")
+    .replace(/Q/g, "գ")
+    .replace(/η/g, "դ");
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+
+  return lines.slice(1).map(line => {
+    const [id, question, a, b, c, d, correct, image] = line.split(";");
+
+    return {
+      id: Number(id),
+      ...(image ? { image: image.trim() } : {}),
+      question: fixText(question.trim()),
+      answers: [
+        { text: fixText(a.trim()), correct: correct == 1 },
+        { text: fixText(b.trim()), correct: correct == 2 },
+        { text: fixText(c.trim()), correct: correct == 3 },
+        { text: fixText(d.trim()), correct: correct == 4 }
+      ]
+    };
+  });
+}

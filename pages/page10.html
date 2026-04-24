@@ -195,16 +195,14 @@ onAuthStateChanged(auth, (user) => {
 
   const ref = doc(db, "users", user.uid, "stats", "page10");
 
-  onSnapshot(ref, (snap) => {
-    if (!snap.exists()) return;
+ onSnapshot(ref, (snap) => {
+          let data = snap.exists() ? snap.data() : {};
 
-    let data = snap.data();
-
-    updateCircle("c1", data.option1 || 0);
-    updateCircle("c2", data.option2 || 0);
-    updateCircle("c3", data.option3 || 0);
-    updateCircle("c4", data.option4 || 0);
-  });
+          updateCircle("c1", data.option1 || 0);
+          updateCircle("c2", data.option2 || 0);
+          updateCircle("c3", data.option3 || 0);
+          updateCircle("c4", data.option4 || 0);
+        });
 });
 </script>
 

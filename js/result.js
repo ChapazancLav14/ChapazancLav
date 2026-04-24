@@ -1,7 +1,10 @@
-//result.js
 import { auth, db } from "./data.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 // ===============================
 // 📦 LOAD RESULT DATA
@@ -39,28 +42,15 @@ if (isNaN(percent) || percent < 0) percent = 0;
 if (percent > 100) percent = 100;
 
 // ===============================
-// 🔥 GET META
-// ===============================
-const option = localStorage.getItem("currentOption");
-const currentPage = localStorage.getItem("currentPage");
-
-console.log("📊 RESULT:", percent);
-console.log("🎯 OPTION:", option);
-console.log("📄 PAGE:", currentPage);
-
-// ===============================
 // 🔥 SAVE TO FIREBASE
 // ===============================
 async function saveResult(user) {
-  if (!user) {
-    console.log("❌ USER NOT LOGGED IN");
-    return;
-  }
+  if (!user) return;
 
-  if (!option || !currentPage) {
-    console.log("❌ Missing option or page");
-    return;
-  }
+  const option = localStorage.getItem("currentOption");
+  const currentPage = localStorage.getItem("currentPage");
+
+  if (!option || !currentPage) return;
 
   const ref = doc(db, "users", user.uid, "stats", currentPage);
   const key = "option" + option;
@@ -69,37 +59,23 @@ async function saveResult(user) {
     const snap = await getDoc(ref);
     let existingData = snap.exists() ? snap.data() : {};
 
-    console.log("📦 BEFORE:", existingData);
-
     const shouldSave =
-      existingData[key] === undefined ||
-      percent > existingData[key];
+      existingData[key] === undefined || percent > existingData[key];
 
     if (shouldSave) {
-      await setDoc(ref, {
-        [key]: percent
-      }, { merge: true });
-
-      console.log("🔥 SAVED:", key, percent);
-    } else {
-      console.log("ℹ️ Existing score higher, skipped");
+      await setDoc(
+        ref,
+        { [key]: percent },
+        { merge: true }
+      );
     }
-
   } catch (err) {
     console.error("❌ SAVE ERROR:", err);
   }
 }
 
-// ===============================
-// 🔐 WAIT FOR AUTH
-// ===============================
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("✅ Auth ready");
-    saveResult(user);
-  } else {
-    console.log("⏳ Waiting for auth...");
-  }
+  if (user) saveResult(user);
 });
 
 // ===============================
@@ -110,32 +86,81 @@ circle.style.setProperty("--percent", percent + "%");
 
 document.getElementById("percent").innerText = percent + "%";
 document.getElementById("time").innerText = resultData.time + " sec";
-document.getElementById("correct").innerText = resultData.score;
-document.getElementById("wrong").innerText = resultData.total - resultData.score;
+let correctCount = 0;
+let wrongCount = 0;
+let partialCount = 0;
+
+resultData.answers.forEach((q) => {
+  if (!q || !q.attempts) return;
+
+  const hasCorrect = q.attempts.some(a => a.isCorrect);
+  const hasWrong = q.attempts.some(a => !a.isCorrect);
+
+  if (hasCorrect && hasWrong) {
+    partialCount++; // 🟠 ԹԵՐԻ
+  } else if (hasCorrect) {
+    correctCount++; // ✅ ONLY pure correct
+  } else {
+    wrongCount++; // ❌ ONLY pure wrong
+  }
+});
+
+// ✅ SET UI
+document.getElementById("correct").innerText = correctCount;
+document.getElementById("wrong").innerText = wrongCount;
+document.getElementById("partial").innerText = partialCount;
+
+const skipped = (resultData.total || 0) - (resultData.answered || 0);
+document.getElementById("skipped").innerText = skipped;
 
 // ===============================
-// 📋 ANSWER GRID
+// ✅ STATUS LOGIC (FIXED)
+// ===============================
+function getQuestionStatus(qData) {
+  if (!qData || !qData.attempts || qData.attempts.length === 0) {
+    return "unanswered";
+  }
+
+  const hasCorrect = qData.attempts.some(a => a.isCorrect);
+  const hasWrong = qData.attempts.some(a => !a.isCorrect);
+
+  if (hasCorrect && hasWrong) return "partial"; // 🟠 ԹԵՐԻ
+  if (hasCorrect) return "correct";             // ✅
+  return "wrong";                               // ❌
+}
+
+// ===============================
+// 🔢 GRID
 // ===============================
 const grid = document.getElementById("grid");
 
-resultData.answers.forEach((a, i) => {
-  const btn = document.createElement("button");
 
+resultData.answers.forEach((a, i) => {
+  if (!a) return;
+
+  const btn = document.createElement("button");
   btn.innerText = i + 1;
-  btn.className = a.isCorrect ? "correct-box" : "wrong-box";
+
+  const status = getQuestionStatus(a);
+
+  if (status === "correct") {
+    btn.className = "correct-box";
+  } else if (status === "wrong") {
+    btn.className = "wrong-box";
+  } else if (status === "partial") {
+    btn.className = "partial-box";
+  }
 
   btn.onclick = () => {
-    // ✅ SAVE REVIEW DATA
     localStorage.setItem("reviewQuestion", JSON.stringify(a));
-
-    // ❗ IMPORTANT: DO NOT DELETE quizResults when going to review
     localStorage.setItem("fromReview", "true");
-
     window.location.href = "./review.html";
   };
 
   grid.appendChild(btn);
 });
+
+// ✅ FIX: correct partial count
 
 // ===============================
 // 🧹 CLEAR DATA SAFELY
@@ -143,12 +168,10 @@ resultData.answers.forEach((a, i) => {
 window.addEventListener("beforeunload", () => {
   const fromReview = localStorage.getItem("fromReview");
 
-  // ❌ DO NOT DELETE if going to review page
   if (fromReview === "true") {
     localStorage.removeItem("fromReview");
     return;
   }
 
-  // ✅ DELETE when leaving result page normally
   localStorage.removeItem("quizResults");
 });

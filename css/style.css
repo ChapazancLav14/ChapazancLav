@@ -383,3 +383,42 @@ body {
   font-size: 18px;
 }
 
+.jump-container {
+  position: fixed;
+  bottom: 75px;   /* 🔥 just above the progress text */
+  right: 20px;    /* 🔥 align to the right (same side as 1/24) */
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.jump-error {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  color: red;
+  font-size: 14px;
+}
+
+.partial-box {
+  border: 2px solid orange;
+  background: #fff3cd;
+}
+
+.review-attempt {
+  margin-bottom: 10px;
+}
+
+.attempt-title {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.review-block {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}

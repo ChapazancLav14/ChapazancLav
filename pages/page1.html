@@ -106,7 +106,7 @@ body {
 <div class="container">
 
   <!-- OPTION 1 -->
-  <button class="custom-button" onclick="openPage(1, 1, 2)">
+  <button class="custom-button" onclick="openPage(1, 0, 0)">
     <div class="left">
       <div class="small-circle" id="c1"><span>0%</span></div>
       <span>Option 1</span>
@@ -195,16 +195,14 @@ onAuthStateChanged(auth, (user) => {
 
   const ref = doc(db, "users", user.uid, "stats", "page1");
 
-  onSnapshot(ref, (snap) => {
-    if (!snap.exists()) return;
+ onSnapshot(ref, (snap) => {
+          let data = snap.exists() ? snap.data() : {};
 
-    let data = snap.data();
-
-    updateCircle("c1", data.option1 || 0);
-    updateCircle("c2", data.option2 || 0);
-    updateCircle("c3", data.option3 || 0);
-    updateCircle("c4", data.option4 || 0);
-  });
+          updateCircle("c1", data.option1 || 0);
+          updateCircle("c2", data.option2 || 0);
+          updateCircle("c3", data.option3 || 0);
+          updateCircle("c4", data.option4 || 0);
+        });
 });
 </script>
 

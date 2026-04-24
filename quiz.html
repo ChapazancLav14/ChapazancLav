@@ -1,51 +1,63 @@
 <!--quiz.html-->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Quiz</title>
+    <title>Quiz</title>
 
-<link rel="icon" type="image/png" href="images/icon.png">
-<link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/icon.png" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
 
-</head>
+  <body>
+    <!-- 🔙 BACK BUTTON -->
+    <button class="back-btn" onclick="goBack()">←</button>
 
-<body>
+    <!-- 🔥 JUMP TO QUESTION (FIXED POSITION) -->
+    <div class="jump-container">
+      <input
+        id="jumpInput"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="1 - 24"
+      />
 
-<!-- 🔙 BACK BUTTON -->
-<button class="back-btn" onclick="goBack()">←</button>
+      <button onclick="jumpToQuestion()">Go</button>
 
-<!-- ✅ QUESTION BOX -->
-<div class="question-box">
-  <div id="question" class="question"></div>
-</div>
+      <div id="jumpError" class="jump-error"></div>
+    </div>
 
-<!-- 🖼 IMAGE -->
-<div id="image-container" class="image-wrapper"></div>
+    <!-- ✅ QUESTION BOX -->
+    <div class="question-box">
+      <div id="question" class="question"></div>
+    </div>
 
-<!-- ✅ ANSWERS -->
-<div id="answers" class="answers"></div>
+    <!-- 🖼 IMAGE -->
+    <div id="image-container" class="image-wrapper"></div>
 
-<!-- ✅ FEEDBACK -->
-<div id="feedback" class="feedback">
-  <h2 id="feedback-title"></h2>
-  <p id="feedback-text"></p>
-  <button onclick="nextQuestion()">ՇԱՐՈՒՆԱԿԵԼ</button>
-</div>
+    <!-- ✅ ANSWERS -->
+    <div id="answers" class="answers"></div>
 
-<!-- ✅ PROGRESS -->
-<div class="progress-wrapper">
-  <div id="progress-text" class="progress-text">0/0</div>
+    <!-- ✅ FEEDBACK -->
+    <div id="feedback" class="feedback">
+      <h2 id="feedback-title"></h2>
+      <p id="feedback-text"></p>
+      <button onclick="nextQuestion()">ՇԱՐՈՒՆԱԿԵԼ</button>
+    </div>
 
-  <div class="progress-container">
-    <div id="progress-bar" class="progress-bar"></div>
-  </div>
-</div>
+    <!-- ✅ PROGRESS -->
+    <div class="progress-wrapper">
+      <div id="progress-text" class="progress-text">0/0</div>
 
-<!-- ✅ SCRIPT -->
-<script type="module" src="js/script.js"></script>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+    </div>
 
-</body>
+    <!-- ✅ SCRIPT -->
+    <script type="module" src="js/script.js"></script>
+  </body>
 </html>
