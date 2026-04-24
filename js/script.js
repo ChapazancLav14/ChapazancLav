@@ -34,14 +34,16 @@
   // ===============================
   // 🔐 AUTH
   // ===============================
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      await loadUserProgress();
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await loadUserProgress();
 
-      // 🔥 DAY TRACK
-      updateDayTrack();
-    }
-  });
+    updateDayTrack();
+
+    // ✅ ADD THIS
+    loadPageBestPercent();
+  }
+});
 
   // ===============================
   // 🔥 DAY TRACK (BOX VERSION)
@@ -347,9 +349,6 @@ async function updateDayTrack() {
     // ❌ mark as wrong forever
     answeredWrong[currentQ.id] = true;
 
-    // 🚫 also REMOVE from correct if it was saved before
-    delete answeredCorrectly[currentQ.id];
-
     // 🔥 update DB immediately
     const user = auth.currentUser;
     if (user) {
@@ -396,6 +395,7 @@ if (isCorrect) {
       endQuiz();
     }
   };
+  saveLiveProgress();
 
   // ===============================
   async function endQuiz() {
@@ -408,20 +408,7 @@ if (isCorrect) {
 
     const user = auth.currentUser;
 
-    // ✅ COUNT CORRECT QUESTIONS FROM DATABASE (not session)
-  let correctCount = 0;
-
-  userAnswers.forEach((q) => {
-    if (!q || !q.attempts) return;
-
-    const hasCorrect = q.attempts.some(a => a.isCorrect);
-    if (hasCorrect) correctCount++;
-  });
-
-  const percent = Math.round((correctCount / filteredQuiz.length) * 100);
-    // ===============================
-    // 🔥 SAVE GLOBAL PROGRESS (HOME %)
-    // ===============================
+const percent = calculateResultPercent();
 
 
     // ===============================
@@ -490,32 +477,41 @@ if (isCorrect) {
 
   }
 
-  async function saveLiveProgress() {
-    const user = auth.currentUser;
-    if (!user) return;
+async function saveLiveProgress() {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    const currentPage = localStorage.getItem("currentPage");
-    const currentOption = localStorage.getItem("currentOption");
+  const currentPage = localStorage.getItem("currentPage");
+  const currentOption = localStorage.getItem("currentOption");
 
-    if (!currentPage || !currentOption) return;
+  if (!currentPage || !currentOption) return;
 
-    const correctCount = filteredQuiz.filter(
-    (q) => answeredCorrectly[q.id]
-  ).length;
+  // ✅ SAME AS RESULT PAGE
+  const percent = calculateResultPercent();
 
-  const percent = Math.round((correctCount / filteredQuiz.length) * 100);
+  const ref = doc(db, "users", user.uid, "stats", currentPage);
 
-    const ref = doc(db, "users", user.uid, "stats", currentPage);
+  try {
+    const snap = await getDoc(ref);
+    let prev = snap.exists()
+      ? snap.data()["option" + currentOption] || 0
+      : 0;
 
-    try {
-      const snap = await getDoc(ref);
-      let prev = snap.exists() ? snap.data()["option" + currentOption] || 0 : 0;
-
-
-    } catch (err) {
-      console.error("🔥 Live save error:", err);
+    // ✅ ONLY SAVE IF BETTER
+    if (percent > prev) {
+      await setDoc(
+        ref,
+        {
+          ["option" + currentOption]: percent,
+        },
+        { merge: true }
+      );
     }
+
+  } catch (err) {
+    console.error("🔥 Live save error:", err);
   }
+}
 
   // ===============================
   function updateProgress() {
@@ -606,3 +602,51 @@ if (isCorrect) {
     if (hasCorrect) return "correct";
     return "wrong";
   }
+
+  async function loadPageBestPercent() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const currentPage = localStorage.getItem("currentPage");
+  const currentOption = localStorage.getItem("currentOption");
+
+  if (!currentPage || !currentOption) return;
+
+  const ref = doc(db, "users", user.uid, "stats", currentPage);
+
+  try {
+    const snap = await getDoc(ref);
+
+    let best = 0;
+
+    if (snap.exists()) {
+      best = snap.data()["option" + currentOption] || 0;
+    }
+
+    // 🔥 DISPLAY IT
+    const el = document.getElementById("page-best");
+    if (el) {
+      el.innerText = best + "%";
+    }
+
+  } catch (err) {
+    console.error("🔥 Load page % error:", err);
+  }
+}
+
+function calculateResultPercent() {
+  let correct = 0;
+
+  userAnswers.forEach((q) => {
+    if (!q || !q.attempts) return;
+
+    // ✅ ONLY first attempt counts (same as your result page)
+    if (q.attempts[0]?.isCorrect) {
+      correct++;
+    }
+  });
+
+  return filteredQuiz.length === 0
+    ? 0
+    : Math.round((correct / filteredQuiz.length) * 100);
+}

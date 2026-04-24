@@ -212,14 +212,11 @@ function updateCircle(answeredCorrectly, answeredWrong = {}) {
 
   const validIds = new Set(questionsCache.map(q => q.id));
 
-  const correctCount = Object.keys(answeredCorrectly)
-    .filter(id =>
-      validIds.has(Number(id)) &&
-      !answeredWrong[id] // 🚫 EXCLUDE partial
-    )
-    .length;
+const correctCount = Object.keys(answeredCorrectly)
+  .filter(id => validIds.has(Number(id)))
+  .length;
 
-  const percent = Math.round((correctCount / total) * 100);
+const percent = Math.round((correctCount / total) * 100);
 
   const circle = document.getElementById("progress-circle");
 
