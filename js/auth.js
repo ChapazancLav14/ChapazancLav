@@ -234,10 +234,10 @@ async function login() {
 
     await userCred.user.reload();
 
-    if (!userCred.user.emailVerified) {
-      showError("Please verify your email first.", true);
-      return;
-    }
+if (!userCred.user.emailVerified) {
+  showSuccess("Please verify your email first.", true);
+  return;
+}
 
     window.location.href = "home.html";
   } catch (err) {
