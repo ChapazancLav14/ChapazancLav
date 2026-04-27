@@ -1,208 +1,60 @@
-<!--home.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Start Page</title>
-<link rel="icon" type="image/png" href="images/icon.png">
+  <meta charset="UTF-8">
+  <title>Start Page</title>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 60px;
-}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* 🔐 LOGOUT */
-.logout-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #444;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
+  <link rel="icon" type="image/png" href="images/icon.png">
 
-/* 🔥 TOP ROW (circle + reset) */
-.top-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-/* 🔴 PROGRESS */
-.circle {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: conic-gradient(#0f6d4d 0%, #ddd 0%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.circle::before {
-  content: "";
-  width: 130px;
-  height: 130px;
-  background: #f5f5f5;
-  border-radius: 50%;
-  position: absolute;
-}
-
-.circle-text {
-  position: relative;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-/* 🔥 RESET BUTTON (FIXED SIZE) */
-.reset-button {
-  height: 50px;
-  padding: 0 25px;
-  border-radius: 12px;
-  border: none;
-  background: #c62828;
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  white-space: nowrap;
-}
-
-.reset-button:hover {
-  background: #b71c1c;
-}
-
-/* 🔘 START BUTTON */
-.button-container {
-  width: 80%;
-  max-width: 600px;
-}
-
-.custom-button {
-  background-color: #0f6d4d;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 18px;
-  width: 100%;
-  font-size: 18px;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-  margin-bottom: 25px;
-}
-
-/* 🔥 MONTH NAV */
-.month-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.arrow-group {
-  display: flex;
-  gap: 10px;
-}
-
-.arrow-btn {
-  width: 50px;
-  height: 50px;
-  border: none;
-  border-radius: 14px;
-  background: #1f6f4a;
-  color: white;
-  font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.arrow-btn:disabled {
-  opacity: 0.3;
-}
-
-.month-info {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-/* 📅 CALENDAR */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  max-width: 350px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.day-box {
-  width: 35px;
-  height: 35px;
-  border-radius: 6px;
-  background: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-.day-box.active {
-  background: #00e08f;
-  color: white;
-  font-weight: bold;
-}
-
-/* ❌ DAY TRACK REMOVED VISUALLY */
-.day-track {
-  display: none;
-}
-</style>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
 
 <body>
 
+<!-- 🔥 LOADER -->
+<div id="homeLoader" class="home-loader">
+  <div class="loader-card">
+    <div class="loader-logo">LiGri</div>
+    <div class="loader-ring"></div>
+    <p>Loading your progress...</p>
+  </div>
+</div>
+
+<!-- REAL APP -->
+<main id="homeApp" class="home-app hidden">
+
 <button class="logout-btn" id="logoutBtn">Logout</button>
 
-<!-- 🔥 TOP ROW -->
+<!-- TOP -->
 <div class="top-row">
 
-  <!-- progress circle -->
   <div class="circle" id="progress-circle">
     <div class="circle-text" id="progress-text">0%</div>
   </div>
 
-  <!-- reset button -->
   <button id="resetBtn" class="reset-button">
-    Reset to 0%
+    Reset progress
   </button>
 
 </div>
 
-<!-- start button -->
+<!-- START -->
 <div class="button-container">
   <button class="custom-button" id="startBtn">
     <span>Start</span>
-    <span>›</span>
+    <span class="arrow">›</span>
   </button>
 </div>
 
-<!-- 🔥 MONTH NAV -->
+<!-- MONTH -->
 <div class="month-wrapper">
   <div class="arrow-group">
-    <button id="prevMonth" class="arrow-btn">◀</button>
-    <button id="nextMonth" class="arrow-btn">▶</button>
+<button id="prevMonth" class="arrow-btn" disabled>◀</button>
+<button id="nextMonth" class="arrow-btn" disabled>▶</button>
   </div>
 
   <div class="month-info">
@@ -211,11 +63,31 @@ body {
   </div>
 </div>
 
-<!-- calendar -->
+<!-- CALENDAR -->
 <div id="day-boxes"></div>
 
-<!-- hidden (kept for JS compatibility) -->
-<div id="day-track" class="day-track"></div>
+<!-- MODAL -->
+<div id="dayModal" class="day-modal hidden">
+  <div class="day-modal-card">
+
+    <button class="day-modal-close" onclick="closeDayModal()">
+      ✕
+    </button>
+
+    <h2 id="dayModalTitle"></h2>
+
+    <p class="total">
+      Ընդհանուր հարցեր: <span id="dayTotal">0</span>
+    </p>
+
+    <p>✅ Ճիշտ: <span id="dayCorrect">0</span></p>
+    <p>❌ Սխալ: <span id="dayWrong">0</span></p>
+    <p>🟠 Թերի: <span id="dayPartial">0</span></p>
+
+  </div>
+</div>
+
+</main>
 
 <script>
 startBtn.onclick = () => location.href = "subjects.html";

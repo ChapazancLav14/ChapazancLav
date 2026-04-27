@@ -4,16 +4,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
 
     <title>Quiz</title>
 
     <link rel="icon" type="image/png" href="images/icon.png" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/quiz.css">
   </head>
 
   <body>
     <!-- 🔙 BACK BUTTON -->
-    <button class="back-btn" onclick="goBack()">←</button>
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+    <path d="M15 18L9 12L15 6"></path>
+  </svg>
+</button>
 
     <!-- 🔥 JUMP TO QUESTION (FIXED POSITION) -->
     <div class="jump-container">
@@ -31,9 +38,10 @@
     </div>
 
     <!-- ✅ QUESTION BOX -->
-    <div class="question-box">
-      <div id="question" class="question"></div>
-    </div>
+<div class="question-box">
+  <div id="question-number" class="question-number"></div>
+  <div id="question" class="question"></div>
+</div>
 
     <!-- 🖼 IMAGE -->
     <div id="image-container" class="image-wrapper"></div>

@@ -1,0 +1,103 @@
+/*buttons.css*/
+.back-btn,
+.back-button {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: white;
+  font-size: 26px;  
+  cursor: pointer;
+  z-index: 1000;
+  transition: 0.2s;
+  background: linear-gradient(135deg, #026e51, #47d6a6);
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.back-btn {
+  backdrop-filter: blur(6px);
+}
+
+.back-btn:hover,
+.back-button:hover {
+  background: linear-gradient(135deg, #043527, #08875d);
+  transform: translateY(-2px);
+}
+
+.back-btn svg {
+  width: 22px;
+  height: 22px;
+
+  stroke: white;
+  stroke-width: 2.5;
+  fill: none;
+
+  display: block;
+}
+
+.logout-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  background: #263238;
+  color: white;
+  padding: 11px 18px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.reset-button {
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 14px;
+  border: none;
+  background: var(--red);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+}
+
+.reset-button:hover {
+  filter: brightness(0.95);
+}
+
+.custom-button,
+.option-btn {
+  background: linear-gradient(135deg, var(--green), #12835c);
+  color: white;
+  border: none;
+  border-radius: 22px;
+  padding: 18px 22px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: 0.2s;
+}
+
+.custom-button:hover,
+.option-btn:hover {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  transform: translateY(-2px);
+}
+
+.arrow {
+  font-size: 24px;
+  flex-shrink: 0;
+  transition: 0.2s;
+}
+
+.custom-button:hover .arrow,
+.option-btn:hover .arrow {
+  transform: translateX(5px);
+}

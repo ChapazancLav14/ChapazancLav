@@ -1,12 +1,21 @@
 //home.js
 import { auth, db } from "./data.js";
-import { onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { doc, setDoc, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 let questionsCache = [];
 let currentViewDate = new Date();
+let latestActiveDays = [];
 
 // ===============================
 // LOAD QUESTIONS
@@ -19,6 +28,23 @@ async function preloadQuestions() {
 }
 
 // ===============================
+// DATE HELPERS
+// ===============================
+function getLocalDateString(date = new Date()) {
+  return (
+    date.getFullYear() +
+    "-" +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(date.getDate()).padStart(2, "0")
+  );
+}
+
+function getMonthKey(date) {
+  return date.getFullYear() + "-" + date.getMonth();
+}
+
+// ===============================
 // STREAK
 // ===============================
 function calculateStreak(activeDays) {
@@ -26,7 +52,6 @@ function calculateStreak(activeDays) {
 
   const sorted = [...activeDays].sort();
 
-  // ✅ normalize today to midnight
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -57,14 +82,10 @@ function updateUserData(user) {
   onSnapshot(ref, async (snap) => {
     let data = snap.exists() ? snap.data() : {};
 
-    const now = new Date();
-const todayStr =
-  now.getFullYear() + "-" +
-  String(now.getMonth() + 1).padStart(2, "0") + "-" +
-  String(now.getDate()).padStart(2, "0");
+    const todayStr = getLocalDateString();
 
-    let lastDate = data.lastActiveDate || null;
     let activeDays = data.activeDays || [];
+    let lastDate = data.lastActiveDate || null;
 
     let shouldUpdate = false;
 
@@ -79,12 +100,17 @@ const todayStr =
     }
 
     if (shouldUpdate) {
-      await setDoc(ref, {
-        lastActiveDate: lastDate,
-        activeDays: activeDays
-      }, { merge: true });
-      
+      await setDoc(
+        ref,
+        {
+          activeDays,
+          lastActiveDate: lastDate,
+        },
+        { merge: true },
+      );
     }
+
+    latestActiveDays = activeDays;
 
     const realStreak = calculateStreak(activeDays);
 
@@ -95,54 +121,55 @@ const todayStr =
 }
 
 // ===============================
-// 🔥 FIXED NAVIGATION (SKIPS EMPTY MONTHS)
+// MONTH NAVIGATION
 // ===============================
 function setupMonthNavigation(activeDays) {
   const prevBtn = document.getElementById("prevMonth");
   const nextBtn = document.getElementById("nextMonth");
 
-  const monthsWithData = activeDays.map(d => {
-    const date = new Date(d);
-    return date.getFullYear() + "-" + date.getMonth();
-  });
+  if (!prevBtn || !nextBtn) return;
 
-  function hasAnyDataInDirection(direction) {
+  const monthsWithData = [
+    ...new Set(
+      activeDays.map((d) => {
+        const date = new Date(d);
+        return getMonthKey(date);
+      }),
+    ),
+  ];
+
+  function findMonthWithData(direction) {
     let temp = new Date(currentViewDate);
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 120; i++) {
       temp.setMonth(temp.getMonth() + direction);
 
-      const key =
-        temp.getFullYear() + "-" + temp.getMonth();
-
-      if (monthsWithData.includes(key)) {
-        return true;
+      if (monthsWithData.includes(getMonthKey(temp))) {
+        return new Date(temp);
       }
     }
 
-    return false;
+    return null;
   }
 
-  // 🔥 NORMAL STEP (no skipping)
+  function updateButtons() {
+    prevBtn.disabled = !findMonthWithData(-1);
+    nextBtn.disabled = !findMonthWithData(1);
+  }
+
   prevBtn.onclick = () => {
     currentViewDate.setMonth(currentViewDate.getMonth() - 1);
-    renderMonthBoxes(activeDays);
+
+    renderMonthBoxes(latestActiveDays);
     updateButtons();
   };
 
   nextBtn.onclick = () => {
     currentViewDate.setMonth(currentViewDate.getMonth() + 1);
-    renderMonthBoxes(activeDays);
+
+    renderMonthBoxes(latestActiveDays);
     updateButtons();
   };
-
-  function updateButtons() {
-    prevBtn.disabled = !hasAnyDataInDirection(-1);
-    nextBtn.disabled = !hasAnyDataInDirection(1);
-
-    prevBtn.style.opacity = prevBtn.disabled ? "0.3" : "1";
-    nextBtn.style.opacity = nextBtn.disabled ? "0.3" : "1";
-  }
 
   updateButtons();
 }
@@ -158,19 +185,21 @@ function renderMonthBoxes(activeDays) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const container = document.getElementById("day-boxes");
+  const monthLabel = document.getElementById("month-label");
+
+  if (!container || !monthLabel) return;
+
   container.innerHTML = "";
-  container.className = "calendar-grid";
 
   const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  weekDays.forEach(day => {
+  weekDays.forEach((day) => {
     const label = document.createElement("div");
     label.innerText = day;
-    label.style.fontWeight = "bold";
     container.appendChild(label);
   });
 
-  let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
 
   for (let i = 0; i < startOffset; i++) {
     container.appendChild(document.createElement("div"));
@@ -182,78 +211,132 @@ function renderMonthBoxes(activeDays) {
     box.innerText = i;
 
     const dateStr =
-      year + "-" +
-      String(month + 1).padStart(2, "0") + "-" +
+      year +
+      "-" +
+      String(month + 1).padStart(2, "0") +
+      "-" +
       String(i).padStart(2, "0");
 
     if (activeDays.includes(dateStr)) {
       box.classList.add("active");
+
+      box.onclick = () => {
+        openDayModal(dateStr);
+      };
     }
 
     container.appendChild(box);
   }
 
-  const monthName = currentViewDate.toLocaleString("en-US", { month: "long" });
-  document.getElementById("month-label").innerText = monthName + " " + year;
+  const monthName = currentViewDate.toLocaleString("en-US", {
+    month: "long",
+  });
 
-  // ❌ COMPLETELY REMOVED DAY TRACK
+  monthLabel.innerText = monthName + " " + year;
 }
 
+// ===============================
+// DAILY STATS MODAL
+// ===============================
+window.openDayModal = async function (dateStr) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "dailyStats", dateStr);
+  const snap = await getDoc(ref);
+
+  const data = snap.exists() ? snap.data() : {};
+
+  document.getElementById("dayModalTitle").innerText = dateStr;
+  document.getElementById("dayTotal").innerText = data.total || 0;
+  document.getElementById("dayCorrect").innerText = data.correct || 0;
+  document.getElementById("dayWrong").innerText = data.wrong || 0;
+  document.getElementById("dayPartial").innerText = data.partial || 0;
+
+  document.getElementById("dayModal").classList.remove("hidden");
+};
+
+window.closeDayModal = function () {
+  document.getElementById("dayModal").classList.add("hidden");
+};
+
+document.getElementById("dayModal")?.addEventListener("click", (e) => {
+  if (e.target.id === "dayModal") {
+    closeDayModal();
+  }
+});
+
+// ===============================
+// STREAK UI
 // ===============================
 function updateStreakText(streak) {
-  document.getElementById("streak-inline").innerText =
-    '🔥' + "Day " + streak;
+  const el = document.getElementById("streak-inline");
+
+  if (el) {
+    el.innerText = "🔥 Day " + streak;
+  }
 }
 
 // ===============================
-function updateCircle(answeredCorrectly, answeredWrong = {}) {
+// OVERALL PROGRESS CIRCLE
+// ===============================
+function updateCircle(answeredCorrectly) {
   const total = questionsCache.length;
   if (!total) return;
 
-  const validIds = new Set(questionsCache.map(q => q.id));
+  const validIds = new Set(questionsCache.map((q) => q.id));
 
-const correctCount = Object.keys(answeredCorrectly)
-  .filter(id => validIds.has(Number(id)))
-  .length;
+  const correctCount = Object.keys(answeredCorrectly).filter((id) =>
+    validIds.has(Number(id)),
+  ).length;
 
-const percent = Math.round((correctCount / total) * 100);
+  const percent = Math.round((correctCount / total) * 100);
 
   const circle = document.getElementById("progress-circle");
+  const text = document.getElementById("progress-text");
 
-  circle.style.background =
-    `conic-gradient(#0f6d4d ${percent}%, #ddd ${percent}%)`;
+  if (!circle || !text) return;
 
-  document.getElementById("progress-text").innerText =
-    percent + "%";
+  circle.style.background = `conic-gradient(
+    var(--green-light) ${percent}%,
+    #ddd ${percent}%
+  )`;
+
+  text.innerText = percent + "%";
 }
 
 // ===============================
+// AUTH
+// ===============================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "index.html";
+    window.location.href = "auth.html";
     return;
   }
 
+  // load everything FIRST
   await preloadQuestions();
 
   const ref = doc(db, "users", user.uid);
 
   updateUserData(user);
 
-onSnapshot(ref, (snap) => {
-  let answeredCorrectly = {};
-  let answeredWrong = {};
+  onSnapshot(ref, (snap) => {
+    let answeredCorrectly = {};
 
-  if (snap.exists()) {
-    answeredCorrectly = snap.data().answeredCorrectly || {};
-    answeredWrong = snap.data().answeredWrong || {};
-  }
+    if (snap.exists()) {
+      answeredCorrectly = snap.data().answeredCorrectly || {};
+    }
 
-  updateCircle(answeredCorrectly, answeredWrong);
+    updateCircle(answeredCorrectly);
+
+    // ✅ SHOW UI ONLY AFTER DATA ARRIVES
+    showHomeApp();
+  });
 });
 
-}); // ✅ THIS WAS MISSING
-
+// ===============================
+// RESET PROGRESS
 // ===============================
 window.resetProgress = async function () {
   const user = auth.currentUser;
@@ -261,22 +344,30 @@ window.resetProgress = async function () {
 
   const ref = doc(db, "users", user.uid);
 
-  await setDoc(ref, {
-    answeredCorrectly: {},
-    answeredWrong: {}
-  }, { merge: true });
+  await setDoc(
+    ref,
+    {
+      answeredCorrectly: {},
+      answeredWrong: {},
+    },
+    { merge: true },
+  );
 
-  // ✅ FORCE CLEAN STATE
   location.reload();
 };
 
 // ===============================
+// LOGOUT
+// ===============================
 window.logout = function () {
   signOut(auth).then(() => {
-    window.location.href = "index.html";
+    window.location.href = "auth.html";
   });
 };
 
+// ===============================
+// CSV HELPERS
+// ===============================
 function fixText(text) {
   if (!text) return text;
 
@@ -287,25 +378,31 @@ function fixText(text) {
     .replace(/Р/g, "բ")
     .replace(/q/g, "գ")
     .replace(/Q/g, "գ")
-    .replace(/η/g, "դ");
+    .replace(/η/g, "դ")
+    .replace(/\bv\b/g, "ν");
 }
 
 function parseCSV(text) {
   const lines = text.trim().split("\n");
 
-  return lines.slice(1).map(line => {
+  return lines.slice(1).map((line) => {
     const [id, question, a, b, c, d, correct, image] = line.split(";");
 
     return {
       id: Number(id),
-      ...(image ? { image: image.trim() } : {}),
-      question: fixText(question.trim()),
+      question: fixText(question?.trim()),
+      image: image?.trim() || "",
       answers: [
-        { text: fixText(a.trim()), correct: correct == 1 },
-        { text: fixText(b.trim()), correct: correct == 2 },
-        { text: fixText(c.trim()), correct: correct == 3 },
-        { text: fixText(d.trim()), correct: correct == 4 }
-      ]
+        { text: fixText(a?.trim()), correct: correct == 1 },
+        { text: fixText(b?.trim()), correct: correct == 2 },
+        { text: fixText(c?.trim()), correct: correct == 3 },
+        { text: fixText(d?.trim()), correct: correct == 4 },
+      ],
     };
   });
+}
+
+function showHomeApp() {
+  document.getElementById("homeLoader")?.classList.add("hidden");
+  document.getElementById("homeApp")?.classList.remove("hidden");
 }
