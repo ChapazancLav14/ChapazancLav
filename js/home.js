@@ -310,7 +310,7 @@ function updateCircle(answeredCorrectly) {
 // ===============================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "auth.html";
+    window.location.href = "index.html";
     return;
   }
 
@@ -361,7 +361,7 @@ window.resetProgress = async function () {
 // ===============================
 window.logout = function () {
   signOut(auth).then(() => {
-    window.location.href = "auth.html";
+    window.location.href = "index.html";
   });
 };
 
