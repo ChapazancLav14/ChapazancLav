@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,4 +206,106 @@
 <script type="module" src="js/home.js"></script>
 
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Start Page</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" type="image/png" href="images/icon.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+
+<body>
+
+<!-- 🔥 LOADER -->
+<div id="homeLoader" class="home-loader">
+  <div class="loader-card">
+    <div class="loader-logo">LiGri</div>
+    <div class="loader-ring"></div>
+    <p>Loading your progress...</p>
+  </div>
+</div>
+
+<!-- REAL APP -->
+<main id="homeApp" class="home-app hidden">
+
+<button class="logout-btn" id="logoutBtn">Logout</button>
+
+<!-- TOP -->
+<div class="top-row">
+
+  <div class="circle" id="progress-circle">
+    <div class="circle-text" id="progress-text">0%</div>
+  </div>
+
+  <button id="resetBtn" class="reset-button">
+    Reset progress
+  </button>
+
+</div>
+
+<!-- START -->
+<div class="button-container">
+  <button class="custom-button" id="startBtn">
+    <span>Start</span>
+    <span class="arrow">›</span>
+  </button>
+</div>
+
+<!-- MONTH -->
+<div class="month-wrapper">
+  <div class="arrow-group">
+<button id="prevMonth" class="arrow-btn" disabled>◀</button>
+<button id="nextMonth" class="arrow-btn" disabled>▶</button>
+  </div>
+
+  <div class="month-info">
+    <span id="month-label"></span> -
+    <span id="streak-inline">Day 0</span>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="day-boxes"></div>
+
+<!-- MODAL -->
+<div id="dayModal" class="day-modal hidden">
+  <div class="day-modal-card">
+
+    <button class="day-modal-close" onclick="closeDayModal()">
+      ✕
+    </button>
+
+    <h2 id="dayModalTitle"></h2>
+
+    <p class="total">
+      Ընդհանուր հարցեր: <span id="dayTotal">0</span>
+    </p>
+
+    <p>✅ Ճիշտ: <span id="dayCorrect">0</span></p>
+    <p>❌ Սխալ: <span id="dayWrong">0</span></p>
+    <p>🟠 Թերի: <span id="dayPartial">0</span></p>
+
+  </div>
+</div>
+
+</main>
+
+<script>
+startBtn.onclick = () => location.href = "subjects.html";
+logoutBtn.onclick = () => window.logout();
+resetBtn.onclick = () => window.resetProgress();
+</script>
+
+<script type="module" src="js/home.js"></script>
+
+</body>
+>>>>>>> fe917d13b26c04e9c81676000bfd21bbcdbca957
 </html>

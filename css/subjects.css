@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*subjects.css*/
 
 body {
@@ -40,4 +41,48 @@ body {
     padding: 16px;
     min-height: 64px;
   }
+=======
+/*subjects.css*/
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 20px 40px;
+}
+
+.container {
+  width: 90%;
+  max-width: 520px;
+}
+
+.option-btn {
+  width: 100%;
+  margin-bottom: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 18px;
+  min-height: 72px;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  body {
+    padding: 80px 14px 30px;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  .option-btn {
+    font-size: 16px;
+    padding: 16px;
+    min-height: 64px;
+  }
+>>>>>>> fe917d13b26c04e9c81676000bfd21bbcdbca957
 }

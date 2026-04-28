@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!--subjects.html-->
 <!DOCTYPE html>
 <html lang="en">
@@ -54,4 +55,66 @@ function goToNext(mode) {
 </script>
 
 </body>
+=======
+<!--subjects.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Mode</title>
+<link rel="icon" type="image/png" href="images/icon.png">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/subjects.css">
+
+</head>
+
+<body>
+
+<!-- 🔙 FIXED BACK BUTTON -->
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+    <path d="M15 18L9 12L15 6"></path>
+  </svg>
+</button>
+
+<div class="container">
+  <button class="option-btn" onclick="goToNext('mode1')">
+    <span>Ֆիզիկա</span>
+    <span>›</span>
+  </button>
+
+  <button class="option-btn" onclick="goToNext('mode2')">
+    <span>Մաթեմատիկա</span>
+    <span>›</span>
+  </button>
+
+  <button class="option-btn" onclick="goToNext('mode3')">
+    <span>Հայոց Լեզու</span>
+    <span>›</span>
+  </button>
+</div>
+
+<script>
+// 🔙 ALWAYS GO HOME
+function goBack() {
+  window.location.href = "home.html";
+}
+
+function goToNext(mode) {
+  localStorage.setItem("selectedMode", mode);
+
+  if (mode === "mode1") {
+    window.location.href = "physics.html";
+  } else if (mode === "mode2") {
+    window.location.href = "math.html";
+  } else if (mode === "mode3") {
+    window.location.href = "language.html";
+  }
+}
+</script>
+
+</body>
+>>>>>>> fe917d13b26c04e9c81676000bfd21bbcdbca957
 </html>
