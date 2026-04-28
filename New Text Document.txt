@@ -1,0 +1,2 @@
+start making json for each question, starting with optics
+

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>home.html</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" type="image/png" href="images/icon.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+
+<body>
+
+<div id="homeLoader" class="home-loader">
+  <div class="loader-card">
+    <div class="loader-logo">LiGri</div>
+    <div class="loader-ring"></div>
+    <p>Loading your progress...</p>
+  </div>
+</div>
+
+<main id="homeApp" class="home-app hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">L</div>
+      <span>LiGri</span>
+    </div>
+
+    <nav class="side-nav">
+      <button class="active">⌂ <span>Home</span></button>
+      <button id="startBtnSide">🎯 <span>Practice</span></button>
+      <button>📖 <span>Review</span></button>
+      <button>📊 <span>Stats</span></button>
+      <button>🏆 <span>Achievements</span></button>
+    </nav>
+
+    <div class="side-card">
+      <h3>Keep learning,<br>keep growing.</h3>
+      <p>Consistency today leads to success tomorrow.</p>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </aside>
+
+  <!-- MAIN -->
+  <section class="dashboard">
+
+    <header class="dashboard-header">
+      <div>
+        <h1>Welcome back 👋</h1>
+        <p>Let’s continue your learning journey.</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn">🔔</button>
+        <button class="icon-btn">✦</button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero-card">
+      <div class="hero-progress">
+        <div class="circle" id="progress-circle">
+          <div class="circle-text" id="progress-text">0%</div>
+        </div>
+
+        <div>
+          <p class="label">Overall Progress</p>
+          <h2>Practice makes progress.</h2>
+          <button class="hero-btn" id="startBtn">
+            Continue Practice <span>›</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-quote">
+        <p>“Small progress every day adds up to big results.”</p>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📚</span>
+        <p>Total Progress</p>
+        <h3 id="statProgress">0%</h3>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">🔥</span>
+        <p>Current Streak</p>
+        <h3 id="streak-inline">Day 0</h3>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <p>Correct Answers</p>
+        <h3 id="statCorrect">0</h3>
+      </div>
+
+      <div class="stat-card danger">
+        <span class="stat-icon">↺</span>
+        <p>Reset</p>
+        <button id="resetBtn" class="reset-button">Reset progress</button>
+      </div>
+    </section>
+
+    <!-- CONTENT GRID -->
+    <section class="content-grid">
+
+      <!-- CALENDAR -->
+      <div class="calendar-panel">
+        <div class="panel-head">
+          <h2>Activity Calendar</h2>
+
+          <div class="month-controls">
+            <button id="prevMonth" class="arrow-btn" disabled>◀</button>
+            <button id="nextMonth" class="arrow-btn" disabled>▶</button>
+          </div>
+        </div>
+
+        <div class="month-info">
+          <span id="month-label"></span>
+        </div>
+
+        <div id="day-boxes"></div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-panel">
+        <h2>Quick Actions</h2>
+
+        <div class="quick-grid">
+          <button onclick="location.href='subjects.html'">
+            <span>🎯</span>
+            Start Quiz
+          </button>
+
+          <button>
+            <span>📖</span>
+            Review
+          </button>
+
+          <button>
+            <span>📌</span>
+            Saved
+          </button>
+
+          <button>
+            <span>🔀</span>
+            Random
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- MOTIVATION -->
+    <section class="bottom-banner">
+      <div>
+        <h2>You’re doing great 🚀</h2>
+        <p>Consistency is the key to success. Keep going!</p>
+      </div>
+
+      <button onclick="location.href='subjects.html'">
+        Go to Practice <span>›</span>
+      </button>
+    </section>
+
+  </section>
+
+  <!-- MODAL -->
+  <div id="dayModal" class="day-modal hidden">
+    <div class="day-modal-card">
+
+      <button class="day-modal-close" onclick="closeDayModal()">✕</button>
+
+      <h2 id="dayModalTitle"></h2>
+
+      <p class="total">
+        Ընդհանուր հարցեր: <span id="dayTotal">0</span>
+      </p>
+
+      <p>✅ Ճիշտ: <span id="dayCorrect">0</span></p>
+      <p>❌ Սխալ: <span id="dayWrong">0</span></p>
+      <p>🟠 Թերի: <span id="dayPartial">0</span></p>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+  startBtn.onclick = () => location.href = "subjects.html";
+  startBtnSide.onclick = () => location.href = "subjects.html";
+  logoutBtn.onclick = () => window.logout();
+  resetBtn.onclick = () => window.resetProgress();
+</script>
+
+<script type="module" src="js/home.js"></script>
+
+</body>
+</html>

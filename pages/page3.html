@@ -1,0 +1,131 @@
+<!--page3.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 1 Options</title>
+<link rel="icon" type="image/png" href="../images/icon.png">
+
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/buttons.css">
+<link rel="stylesheet" href="../css/page-options.css">
+
+</head>
+
+<body>
+
+<!-- 🔙 BACK -->
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+    <path d="M15 18L9 12L15 6"></path>
+  </svg>
+</button>
+
+<h2>Select an option</h2>
+
+<div class="container">
+
+  <!-- OPTION 1 -->
+  <button class="custom-button" onclick="openPage(1, 0, 0)">
+    <div class="left">
+      <div class="small-circle" id="c1"><span>0%</span></div>
+      <span>Option 1</span>
+    </div>
+    <span class="arrow">›</span>
+  </button>
+
+  <!-- OPTION 2 -->
+  <button class="custom-button" onclick="openPage(2, 0, 0)">
+    <div class="left">
+      <div class="small-circle" id="c2"><span>0%</span></div>
+      <span>Option 2</span>
+    </div>
+    <span class="arrow">›</span>
+  </button>
+
+  <!-- OPTION 3 -->
+  <button class="custom-button" onclick="openPage(3, 0, 0)">
+    <div class="left">
+      <div class="small-circle" id="c3"><span>0%</span></div>
+      <span>Option 3</span>
+    </div>
+    <span class="arrow">›</span>
+  </button>
+
+  <!-- OPTION 4 -->
+  <button class="custom-button" onclick="openPage(4, 0, 0)">
+    <div class="left">
+      <div class="small-circle" id="c4"><span>0%</span></div>
+      <span>Option 4</span>
+    </div>
+    <span class="arrow">›</span>
+  </button>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+// 🔥 FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyANzIW_EqzkHVDzpZaD41LkMHugULjsFFk",
+  authDomain: "quiz-app-e973d.firebaseapp.com",
+  projectId: "quiz-app-e973d",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// 🔙 BACK
+window.goBack = function () {
+  window.location.href = "../physics.html";
+};
+
+// 🚀 OPEN QUIZ (NEW CLEAN VERSION)
+window.openPage = function (option, startId, endId) {
+  localStorage.setItem("currentOption", option);
+
+  // 🔥 ADD THIS LINE
+  localStorage.setItem("currentPage", "page3"); // change per file!
+
+  localStorage.setItem("quizStart", startId);
+  localStorage.setItem("quizEnd", endId);
+
+  window.location.href = "../quiz.html";
+};
+
+// 🎯 UPDATE CIRCLE
+function updateCircle(id, percent) {
+  const el = document.getElementById(id);
+
+  el.innerHTML = `<span>${percent}%</span>`;
+
+  el.style.background = `conic-gradient(
+    #00e08f ${percent}%,
+    #e6e6e6 ${percent}%
+  )`;
+}
+
+// 🔥 FIREBASE LIVE LISTENER
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid, "stats", "page3");
+
+ onSnapshot(ref, (snap) => {
+          let data = snap.exists() ? snap.data() : {};
+
+          updateCircle("c1", data.option1 || 0);
+          updateCircle("c2", data.option2 || 0);
+          updateCircle("c3", data.option3 || 0);
+          updateCircle("c4", data.option4 || 0);
+        });
+});
+</script>
+
+</body>
+</html>

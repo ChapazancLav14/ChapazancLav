@@ -1,0 +1,76 @@
+<!--physics-set1.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physcics-set1.html</title>
+  <link rel="icon" type="image/png" href="images/icon.png">
+  <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/physics.css">
+
+  
+</head>
+
+<body>
+
+  <!-- 🔙 Back -->
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+  <path d="M15 18L9 12L15 6"></path>
+</svg>
+</button>
+
+  <div class="wrapper">
+
+    <!-- NAV -->
+    <div class="nav">
+      <button onclick="scrollToSection('section1')">Մեխանիկա</button>
+      <button onclick="scrollToSection('section2')">Մոլեկուլային Ֆիզիկա Եվ Ջերմադինամիկա</button>
+      <button onclick="scrollToSection('section3')">Էլեկտրադինամիկա</button>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div id="section1" class="section">
+      <h1>Մեխանիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page1.html')"><span>1․ ԿԻՆԵՄԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page2.html')"><span>2. ԴԻՆԱՄԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page3.html')"><span>3. ՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page4.html')"><span>4. ԱՇԽԱՏԱՆՔ, ՀԶՈՐՈՒԹՅՈՒՆ, ԷՆԵՐԳԻԱ։ ԻՄՊՈՒԼՍ։ ՊԱՀՊԱՆՄԱՆ ՕՐԵՆՔՆԵՐԸ ՄԵԽԱՆԻԿԱՅՈՒՄ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page5.html')"><span>5. ՀԻԴՐՈՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page6.html')"><span>6. ՄԵԽԱՆԻԿԱԿԱՆ ՏԱՏԱՆՈՒՄՆԵՐ ԵՎ ԱԼԻՔՆԵՐ</span><span class="arrow">›</span></button> 
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div id="section2" class="section">
+      <h1>Մոլեկուլային Ֆիզիկա Եվ Ջերմադինամիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page7.html')"><span>7. ՄՈԼԵԿՈՒԼԱՅԻՆ-ԿԻՆԵՏԻԿ ՏԵՍՈՒԹՅԱՆ ՀԻՄՈՒՆՔՆԵՐԸ: ԳԱԶԱՅԻՆ ՕՐԵՆՔՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page8.html')"><span>8. ՋԵՐՄԱԴԻՆԱՄԻԿԱՅԻ ՀԻՄՈՒՆՔՆԵՐԸ</span><span class="arrow">›</span></button>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div id="section3" class="section">
+      <h1>Էլեկտրադինամիկա</h1>
+
+      <div class="container">
+        <button class="custom-button" onclick="openPage('pages/page9.html')"><span>9. ԷԼԵԿՏՐԱՍՏԱՏԻԿԱ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page10.html')"><span>10. ՀԱՍՏԱՏՈՒՆ ՀՈՍԱՆՔ: ՕՀՄԻ ՕՐԵՆՔԸ ՇՂԹԱՅԻ ՏԵՂԱՄԱՍԻ ՀԱՄԱՐ: ՀԱՂՈՐԴԻՉՆԵՐԻ ՀԱՋՈՐԴԱԿԱՆ ԵՎ ԶՈՒԳԱՀԵՌ ՄԻԱՑՈՒՄՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page11.html')"><span>11. ՄԱԳՆԻՍԱԿԱՆ ԴԱՇՏ: ԷԼԵԿՏՐԱՄԱԳՆԻՍԱԿԱՆ ՏԱՏԱՆՈՒՄՆԵՐ ԵՎ ԱԼԻՔՆԵՐ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page12.html')"><span>12. ՕՊՏԻԿԱ: ՀԱՐԱԲԵՐԱԿԱՆՈՒԹՅԱՆ ՀԱՏՈՒԿ ՏԵՍՈՒԹՅԱՆ ՏԱՐՐԵՐԸ</span><span class="arrow">›</span></button>
+        <button class="custom-button" onclick="openPage('pages/page13.html')"><span>13. ՔՎԱՆՏԱՅԻՆ ՖԻԶԻԿԱ</span><span class="arrow">›</span></button>
+      </div>
+    </div>
+
+  </div>
+
+<script src="js/physics.js"></script>
+
+</body>
+</html>

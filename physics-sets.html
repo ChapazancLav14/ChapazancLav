@@ -1,0 +1,65 @@
+<!--physics-sets.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physics-sets.html</title>
+
+<link rel="icon" type="image/png" href="images/icon.png">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/subjects.css">
+</head>
+
+<body>
+
+<!-- 🔙 BACK -->
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+    <path d="M15 18L9 12L15 6"></path>
+  </svg>
+</button>
+
+<div class="container">
+
+  <!-- 🧠 SHTEMARAN 1 -->
+  <button class="option-btn" onclick="openSet(1)">
+    <span>Ֆիզիկա Շտեմարան 1</span>
+    <span>›</span>
+  </button>
+
+  <!-- 🧠 SHTEMARAN 2 -->
+  <button class="option-btn" onclick="openSet(2)">
+    <span>Ֆիզիկա Շտեմարան 2</span>
+    <span>›</span>
+  </button>
+
+  <!-- 🧠 SHTEMARAN 3 -->
+  <button class="option-btn" onclick="openSet(3)">
+    <span>Ֆիզիկա Շտեմարան 3</span>
+    <span>›</span>
+  </button>
+
+</div>
+
+<script>
+
+// 🔙 BACK
+function goBack() {
+  window.location.href = "subjects.html";
+}
+
+// 🚀 OPEN SHTEMARAN
+function openSet(set) {
+  localStorage.setItem("selectedSet", set);
+
+  // 👇 IMPORTANT: go to correct page
+  window.location.href = `physics-set${set}.html`;
+}
+
+</script>
+
+</body>
+</html>
