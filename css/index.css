@@ -8,7 +8,6 @@ body {
   font-family: Inter, Arial, sans-serif;
   color: #1b2d24;
   background: #f8f3e8 url("../images/login_background.png") center / cover no-repeat;
-  overflow: hidden;
 }
 
 .login-page {
@@ -53,10 +52,10 @@ body {
 }
 
 .flower-logo {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
-  margin-bottom: 1px;
+  margin-bottom: 4px;
   mix-blend-mode: multiply;
 }
 
@@ -117,6 +116,7 @@ body {
 
 .input-row input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
@@ -288,13 +288,17 @@ body {
   font-weight: 700;
 }
 
+/* Tablet */
 @media (max-width: 900px) {
   body {
-    overflow: auto;
+    background-position: center;
   }
 
   .login-page {
+    min-height: 100vh;
     padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
   }
 
   .top-brand {
@@ -302,9 +306,10 @@ body {
   }
 
   .login-content {
-    margin: 40px auto 0;
     width: 100%;
     max-width: 396px;
+    margin: 35px auto 0;
+    padding-top: 0;
   }
 
   .bottom-bar {
@@ -312,5 +317,136 @@ body {
     width: 100%;
     max-width: 396px;
     margin: 28px auto 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  body {
+    background-position: 65% center;
+  }
+
+  .login-page {
+    padding: 22px 16px;
+  }
+
+  .top-brand {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .brand-logo {
+    font-size: 28px;
+  }
+
+  .brand-line {
+    height: 24px;
+  }
+
+  .brand-tagline {
+    font-size: 11px;
+  }
+
+  .login-content {
+    max-width: 360px;
+    margin-top: 24px;
+  }
+
+  .flower-logo {
+    width: 82px;
+    height: 82px;
+  }
+
+  .main-title {
+    font-size: 44px;
+  }
+
+  .subtitle {
+    margin: 12px 0 20px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .auth-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .input-row {
+    height: 54px;
+    font-size: 14px;
+  }
+
+  .input-row:nth-child(2) {
+    margin-top: 16px;
+  }
+
+  .input-row input {
+    font-size: 14px;
+  }
+
+  .main-btn {
+    height: 56px;
+    margin-top: 18px;
+  }
+
+  .card-links {
+    margin: 18px 4px;
+  }
+
+  .text-btn {
+    font-size: 12px;
+  }
+
+  .divider {
+    gap: 10px;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .social-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .social-btn {
+    height: 54px;
+    font-size: 15px;
+  }
+
+  .bottom-bar {
+    margin-top: 20px;
+    flex-direction: column-reverse;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .bottom-bar p {
+    margin: 0;
+    font-size: 11px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .login-page {
+    padding: 18px 12px;
+  }
+
+  .main-title {
+    font-size: 38px;
+  }
+
+  .flower-logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .auth-card {
+    padding: 12px;
+  }
+
+  .top-brand {
+    transform: scale(0.9);
   }
 }
