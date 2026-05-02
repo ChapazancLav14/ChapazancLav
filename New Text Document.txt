@@ -1,7 +1,2 @@
-<<<<<<< HEAD
 start making json for each question, starting with optics
 
-=======
-start making json for each question, starting with optics
-
->>>>>>> fe917d13b26c04e9c81676000bfd21bbcdbca957
