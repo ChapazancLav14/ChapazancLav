@@ -1,4 +1,6 @@
-/*buttons.css*/
+/* buttons.css */
+
+/* 🔙 BACK BUTTON */
 .back-btn,
 .back-button {
   position: fixed;
@@ -8,7 +10,7 @@
   height: 50px;
   border-radius: 50%;
   color: white;
-  font-size: 26px;  
+  font-size: 26px;
   cursor: pointer;
   z-index: 1000;
   transition: 0.2s;
@@ -34,27 +36,26 @@
 .back-btn svg {
   width: 22px;
   height: 22px;
-
   stroke: white;
   stroke-width: 2.5;
   fill: none;
-
   display: block;
 }
 
+/* 🔓 LOGOUT BUTTON (sidebar) */
 .logout-btn {
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  background: #263238;
-  color: white;
-  padding: 11px 18px;
-  border-radius: 14px;
+  position: relative;
+  margin-top: 22px;
   border: none;
+  border-radius: 16px;
+  padding: 14px;
+  background: #1f2937;
+  color: white;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: var(--shadow);
 }
 
+/* 🔄 RESET BUTTON */
 .reset-button {
   height: 52px;
   padding: 0 24px;
@@ -72,6 +73,7 @@
   filter: brightness(0.95);
 }
 
+/* 🟢 MAIN BUTTON STYLE */
 .custom-button,
 .option-btn {
   background: linear-gradient(135deg, var(--green), #12835c);
@@ -91,6 +93,7 @@
   transform: translateY(-2px);
 }
 
+/* ➡️ ARROW */
 .arrow {
   font-size: 24px;
   flex-shrink: 0;
@@ -100,4 +103,78 @@
 .custom-button:hover .arrow,
 .option-btn:hover .arrow {
   transform: translateX(5px);
+}
+
+/* 📘 PHYSICAL QUANTITIES BUTTON */
+.option-btn.quantities-btn {
+  position: fixed !important;
+  top: 18px !important;
+  right: 18px !important;
+  left: auto !important;
+
+  width: 260px !important;
+  max-width: 260px !important;
+  min-width: 260px !important;
+
+  padding: 14px 18px !important;
+  box-sizing: border-box;
+
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  text-decoration: none;
+  z-index: 1500;
+
+  background: linear-gradient(135deg, #6ee7a8, #2bb673);
+}
+
+.option-btn.quantities-btn:hover {
+  background: linear-gradient(135deg, #4fdc97, #1f9e63);
+}
+
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+  .option-btn.quantities-btn {
+    top: 12px !important;
+    right: 12px !important;
+
+    width: 220px !important;
+    max-width: 220px !important;
+    min-width: 220px !important;
+
+    padding: 12px 14px !important;
+    font-size: 15px;
+  }
+}
+
+/* 👤 USER EMAIL (FIXED → NOW HEADER FRIENDLY) */
+.user-email {
+  position: relative; /* 🔥 IMPORTANT FIX */
+
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+
+  padding: 10px 16px;
+  border-radius: 14px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* 📱 MOBILE EMAIL */
+@media (max-width: 600px) {
+  .user-email {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
 }

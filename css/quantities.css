@@ -1,0 +1,180 @@
+/* quantities.css */
+
+.page {
+  min-height: 100vh;
+  padding: 85px 12px 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page h1 {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: clamp(20px, 5vw, 32px);
+  color: #063d2f;
+}
+
+.table-wrapper {
+  width: min(1000px, 96vw);
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+}
+
+table {
+  width: 100%;
+  max-width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 18px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+  table-layout: fixed;
+}
+
+thead tr {
+  background: linear-gradient(135deg, var(--green), #12835c);
+}
+
+th {
+  background: transparent;
+  color: white;
+  padding: clamp(6px, 1.5vw, 14px);
+  font-size: clamp(9px, 2.2vw, 15px);
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+th:last-child {
+  border-right: none;
+}
+
+td {
+  padding: clamp(5px, 1.4vw, 12px);
+  font-size: clamp(9px, 2vw, 14px);
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+  width: 58%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 12%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 16%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 14%;
+}
+
+td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* keeps the same badge design, but fixes text width */
+.quantity-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 10px);
+}
+
+.quantity-row strong {
+  min-width: clamp(18px, 5vw, 28px);
+  height: clamp(18px, 5vw, 28px);
+
+  border-radius: 8px;
+  background: #e6f7ef;
+  color: var(--green);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: clamp(9px, 2vw, 13px);
+  flex-shrink: 0;
+}
+
+.quantity-text {
+  flex: 1;
+  min-width: 0;
+
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  white-space: normal;
+}
+
+td:nth-child(2) {
+  font-weight: bold;
+  font-size: clamp(10px, 2.4vw, 16px);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(0, 128, 0, 0.03);
+}
+
+tbody tr:hover {
+  background: rgba(0, 128, 0, 0.08);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .table-wrapper {
+    width: 98vw;
+  }
+
+  table {
+    border-radius: 12px;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 58%;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 12%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 17%;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 13%;
+  }
+}

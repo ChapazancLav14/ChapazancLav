@@ -17,6 +17,7 @@ let questionsCache = [];
 let currentViewDate = new Date();
 let latestActiveDays = [];
 
+
 // ===============================
 // LOAD QUESTIONS
 // ===============================
@@ -314,13 +315,23 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // load everything FIRST
+  // 👤 SHOW USER EMAIL
+  const emailEl = document.getElementById("userEmail");
+  if (emailEl) {
+    emailEl.textContent = user.email;
+  }
+
+  // ===============================
+  // LOAD DATA FIRST
+  // ===============================
   await preloadQuestions();
 
   const ref = doc(db, "users", user.uid);
 
+  // update user activity + streak
   updateUserData(user);
 
+  // listen to user data changes
   onSnapshot(ref, (snap) => {
     let answeredCorrectly = {};
 
@@ -406,3 +417,4 @@ function showHomeApp() {
   document.getElementById("homeLoader")?.classList.add("hidden");
   document.getElementById("homeApp")?.classList.remove("hidden");
 }
+

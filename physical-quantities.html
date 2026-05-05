@@ -1,0 +1,55 @@
+<!--physical-quantities.html-->
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ֆիզիկական մեծություններ</title>
+
+<link rel="icon" type="image/png" href="images/icon.png">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/quantities.css">
+</head>
+
+<body>
+
+<!-- 🔙 BACK -->
+<button class="back-btn" onclick="goBack()">
+  <svg class="back-icon" viewBox="0 0 24 24">
+    <path d="M15 18L9 12L15 6"></path>
+  </svg>
+</button>
+
+<div class="page">
+
+  <h1>Ֆիզիկական մեծություններ</h1>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Մեծություն</th>
+          <th>Նշանակում</th>
+          <th>Արժեք</th>
+          <th>Չափայնություն</th>
+        </tr>
+      </thead>
+
+      <tbody id="quantitiesTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="js/quantities.js"></script>
+
+<script>
+function goBack() {
+  window.location.href = "physics-sets.html";
+}
+</script>
+
+</body>
+</html>
