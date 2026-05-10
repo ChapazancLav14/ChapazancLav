@@ -277,10 +277,12 @@ async function loadQuestions() {
 // ===============================
 function loadQuestion() {
   const input = document.getElementById("jumpInput");
+
   if (input) {
     input.value = "";
     input.placeholder = `1 - ${filteredQuiz.length}`;
   }
+
   const q = filteredQuiz[currentQuestion];
 
   if (!q) {
@@ -288,8 +290,29 @@ function loadQuestion() {
     return;
   }
 
+  // ✅ OPTION 1 DESKTOP IMAGE LAYOUT
+  // Works when currentOption is 1 OR range is 1–125
+  const currentOption = localStorage.getItem("currentOption");
+  const start = Number(localStorage.getItem("quizStart"));
+  const end = Number(localStorage.getItem("quizEnd"));
+
+  document.body.classList.remove("option1-image-layout");
+
+  if (
+    (currentOption === "1" || (start === 1 && end === 125)) &&
+    q.image &&
+    q.image.trim() !== ""
+  ) {
+    document.body.classList.add("option1-image-layout");
+  }
+
+  // ✅ QUESTION
   document.getElementById("question").innerHTML = formatMath(q.question);
 
+  document.getElementById("question-number").innerText =
+    `Question ${currentQuestion + 1} / ${filteredQuiz.length}`;
+
+  // ✅ IMAGE
   const imageContainer = document.getElementById("image-container");
   imageContainer.innerHTML = "";
 
@@ -312,6 +335,7 @@ function loadQuestion() {
     imageContainer.style.display = "none";
   }
 
+  // ✅ ANSWERS
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
 
@@ -321,16 +345,23 @@ function loadQuestion() {
   } else {
     answersDiv.style.gridAutoFlow = "row";
   }
-  document.getElementById("question-number").innerText =
-    `Question ${currentQuestion + 1} / ${filteredQuiz.length}`;
 
   q.answers.forEach((ans, index) => {
     const btn = document.createElement("button");
     btn.className = "answer";
-    btn.innerHTML = index + 1 + ". " + formatMath(ans.text);
+
+    const answerText = ans.text.trim().replace(/\r/g, "");
+
+    if (/\.(png|jpg|jpeg|webp)$/i.test(answerText)) {
+      btn.innerHTML = `
+        <span>${index + 1}.</span>
+        <img src="${answerText}" class="answer-image">
+      `;
+    } else {
+      btn.innerHTML = index + 1 + ". " + formatMath(answerText);
+    }
 
     btn.onclick = () => checkAnswer(btn, index);
-
     answersDiv.appendChild(btn);
   });
 }
@@ -588,24 +619,61 @@ function fixText(text) {
     .replace(/\bv\b/g, "ν");
 }
 
+function isImagePath(text) {
+  return /\.(png|jpg|jpeg|webp|gif)$/i.test(
+    text.trim().replace(/\r/g, "")
+  );
+}
+
+// script.js
+
+function cleanAnswer(text) {
+  text = text.trim().replace(/\r/g, "");
+
+  // ✅ image paths must NOT be changed
+  if (isImagePath(text)) {
+    return text;
+  }
+
+  // ✅ fix OCR/text first
+  text = fixText(text);
+
+  // ✅ remove ":" or Armenian "։" only from the END of answer choices
+  text = text.replace(/\s*[:։]\s*$/g, "");
+
+  return text;
+}
+
 function parseCSV(text) {
-  const lines = text.trim().split("\n");
+  const lines = text
+    .trim()
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
 
-  return lines.slice(1).map((line) => {
-    const [id, question, a, b, c, d, correct, image] = line.split(";");
+  return lines
+    .slice(1)
+    .map((line) => {
+      const [id, question, a, b, c, d, correct, image] = line.split(";");
 
-    return {
-      id: Number(id),
-      ...(image ? { image: image.trim() } : {}),
-      question: fixText(question.trim()),
-      answers: [
-        { text: fixText(a.trim()), correct: correct == 1 },
-        { text: fixText(b.trim()), correct: correct == 2 },
-        { text: fixText(c.trim()), correct: correct == 3 },
-        { text: fixText(d.trim()), correct: correct == 4 },
-      ],
-    };
-  });
+      if (!id || !question || !a || !b || !c || !d || !correct) {
+        console.warn("⚠️ Bad CSV line skipped:", line);
+        return null;
+      }
+
+      return {
+        id: Number(id),
+        image: image?.trim().replace(/\r/g, "") || "",
+        question: fixText(question.trim()),
+        answers: [
+          { text: cleanAnswer(a), correct: correct == 1 },
+          { text: cleanAnswer(b), correct: correct == 2 },
+          { text: cleanAnswer(c), correct: correct == 3 },
+          { text: cleanAnswer(d), correct: correct == 4 },
+        ],
+      };
+    })
+    .filter(Boolean);
 }
 
 window.jumpToQuestion = function () {
@@ -700,17 +768,29 @@ function calculateResultPercent() {
 function formatFractions(text) {
   if (!text) return text;
 
-  return text.replace(/([^\/]+)\/([^\/]+)/g, (match, num, den) => {
-    num = num.trim();
-    den = den.trim();
+  return text.replace(
+    /(\([^()\/]+\)|[^\s:;,\/]+)\/(\([^()\/]+\)|[^\s:;,\/]+)/g,
+    (match, num, den) => {
+      num = num.trim();
+      den = den.trim();
 
-    return `
-      <span class="frac">
-        <span class="top">${num}</span>
-        <span class="bottom">${den}</span>
-      </span>
-    `;
-  });
+      // Remove outside parentheses only for display
+      if (num.startsWith("(") && num.endsWith(")")) {
+        num = num.slice(1, -1);
+      }
+
+      if (den.startsWith("(") && den.endsWith(")")) {
+        den = den.slice(1, -1);
+      }
+
+      return `
+        <span class="frac">
+          <span class="top">${num}</span>
+          <span class="bottom">${den}</span>
+        </span>
+      `;
+    }
+  );
 }
 
 function formatSuperscript(text) {
@@ -828,3 +908,129 @@ function mergeDailyStatus(oldStatus, newStatus) {
 
   return oldStatus;
 }
+
+// ===============================
+// 🧮 CALCULATOR
+// ===============================
+
+window.toggleCalculator = function () {
+  document
+    .getElementById("calculatorBlock")
+    .classList.toggle("hidden-calculator");
+};
+
+window.appendCalc = function (value) {
+  const display = document.getElementById("calcDisplay");
+
+  if (display.value === "Error") {
+    display.value = "";
+  }
+
+  let current = display.value;
+
+  const operators = ["+", "-", "*", "/", "^", "!"];
+  const normalOperators = ["+", "-", "*", "/", "^"];
+
+  if (value === "+/-") {
+    if (current.startsWith("-")) {
+      display.value = current.slice(1);
+    } else if (current !== "") {
+      display.value = "-" + current;
+    }
+    return;
+  }
+
+  const lastChar = current.slice(-1);
+
+  // ✅ only one operator at a time: last clicked stays
+  if (operators.includes(value)) {
+    if (operators.includes(lastChar)) {
+      display.value = current.slice(0, -1) + value;
+      return;
+    }
+  }
+
+  // ❌ factorial cannot start
+  if (value === "!" && current === "") return;
+
+  // ❌ factorial only after number or )
+  if (value === "!" && !/[0-9)]$/.test(current)) return;
+
+  // ❌ normal operators cannot start except -
+  if (current === "" && normalOperators.includes(value) && value !== "-") {
+    return;
+  }
+
+  // ❌ prevent ")" without matching "("
+  if (value === ")") {
+    const open = (current.match(/\(/g) || []).length;
+    const close = (current.match(/\)/g) || []).length;
+
+    if (open <= close) return;
+  }
+
+  display.value += value;
+};
+
+window.clearCalc = function () {
+  document.getElementById("calcDisplay").value = "";
+};
+
+window.deleteCalc = function () {
+  const display = document.getElementById("calcDisplay");
+
+  if (display.value === "Error") {
+    display.value = "";
+    return;
+  }
+
+  display.value = display.value.slice(0, -1);
+};
+
+function factorial(n) {
+  n = Number(n);
+
+  if (n < 0 || !Number.isInteger(n)) return NaN;
+
+  // ✅ prevents page crash / huge Infinity values
+  if (n > 170) return NaN;
+
+  let result = 1;
+  for (let i = 2; i <= n; i++) {
+    result *= i;
+  }
+
+  return result;
+}
+
+function replaceFactorials(expression) {
+  return expression.replace(/(\d+)!/g, (_, num) => {
+    return factorial(Number(num));
+  });
+}
+
+window.calculateCalc = function () {
+  const display = document.getElementById("calcDisplay");
+
+  if (display.value === "" || display.value === "Error") return;
+
+  try {
+    let expression = display.value
+      .replace(/÷/g, "/")
+      .replace(/×/g, "*")
+      .replace(/\^/g, "**");
+
+    expression = replaceFactorials(expression);
+
+    const result = Function('"use strict"; return (' + expression + ")")();
+
+    if (!Number.isFinite(result)) {
+      display.value = "Error";
+      return;
+    }
+
+    display.value = result;
+  } catch {
+    display.value = "Error";
+  }
+};

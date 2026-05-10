@@ -333,3 +333,299 @@ body {
     font-size: 15px;
   }
 }
+
+/* =========================
+   CALCULATOR
+========================= */
+
+/* 🧮 TOGGLE BUTTON */
+.calculator-toggle {
+  position: fixed;
+  top: 16px;
+  right: 24px;
+  z-index: 1500;
+
+  width: 76px;
+  height: 76px;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+/* move ONLY on hover */
+.calculator-toggle:hover {
+  transform: translateY(-6px) scale(1.08);
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.18));
+}
+
+.calculator-toggle:active {
+  transform: scale(0.94);
+}
+
+.calculator-toggle img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  background: transparent;
+}
+
+/* =========================
+   CALCULATOR BLOCK
+========================= */
+
+.calculator-block {
+  position: fixed;
+  top: 100px;
+  right: 24px;
+
+  width: 292px;
+  padding: 14px;
+
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(18, 131, 92, 0.16);
+  border-radius: 22px;
+
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+
+  z-index: 1400;
+
+  animation: calcOpen 0.22s ease;
+}
+
+.hidden-calculator {
+  display: none;
+}
+
+@keyframes calcOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================
+   DISPLAY
+========================= */
+
+.calc-display {
+  width: 100%;
+  height: 54px;
+
+  border: 1px solid rgba(18, 131, 92, 0.18);
+  outline: none;
+
+  border-radius: 16px;
+  padding: 10px 14px;
+
+  font-size: 22px;
+  font-weight: 800;
+  text-align: right;
+
+  color: #063d2f;
+  background: linear-gradient(135deg, #ffffff, #eefaf5);
+
+  margin-bottom: 12px;
+
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================
+   GRID
+========================= */
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.empty-calc-btn {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.calc-grid button {
+  height: 52px;
+
+  border-radius: 15px;
+  border: 1px solid rgba(18, 131, 92, 0.12);
+
+  font-size: 17px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  color: #063d2f;
+  background: linear-gradient(135deg, #ffffff, #f0fbf6);
+
+  box-shadow:
+    0 5px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  transition: 0.18s ease;
+}
+
+.calc-grid button:hover {
+  background: linear-gradient(135deg, #e7fff4, #d7f7ea);
+  border-color: rgba(18, 131, 92, 0.28);
+  transform: translateY(-2px);
+}
+
+.calc-grid button:active {
+  transform: scale(0.94);
+}
+
+/* equals */
+.equals-btn {
+  background: linear-gradient(135deg, var(--green), #12835c) !important;
+  color: white !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 18px rgba(18, 131, 92, 0.28) !important;
+}
+
+.equals-btn:hover {
+  background: linear-gradient(135deg, var(--green-dark), var(--green)) !important;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+  .calculator-toggle {
+    width: 64px;
+    height: 64px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .calculator-toggle img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .calculator-block {
+    width: 250px;
+    right: 12px;
+    top: 82px;
+    padding: 12px;
+  }
+
+  .calc-grid {
+    gap: 7px;
+  }
+
+  .calc-grid button {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+.answer-image {
+  max-width: 140px;
+  max-height: 70px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* =========================
+   OPTION 1 DESKTOP IMAGE LAYOUT
+   Left: question + answers
+   Right: bigger image
+========================= */
+
+.quiz-layout {
+  width: 100%;
+}
+
+/* Desktop only */
+@media (min-width: 901px) {
+  body.option1-image-layout {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  body.option1-image-layout .quiz-layout {
+    width: min(1180px, 92vw);
+    margin: 62px auto 12px;
+
+    display: grid;
+    grid-template-columns: minmax(520px, 720px) minmax(320px, 460px);
+    gap: 28px;
+    align-items: start;
+  }
+
+  body.option1-image-layout .quiz-left {
+    min-width: 0;
+  }
+
+  body.option1-image-layout .question-box {
+    margin: 0 0 12px;
+    max-width: none;
+    width: 100%;
+  }
+
+  body.option1-image-layout .answers {
+    margin: 12px 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  body.option1-image-layout .image-wrapper {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+
+    position: sticky;
+    top: 92px;
+  }
+
+  body.option1-image-layout .question-image {
+    width: 100%;
+    max-width: 100%;
+    max-height: 52vh;
+    object-fit: contain;
+
+    border-radius: 20px;
+    background: white;
+    box-shadow: var(--shadow);
+  }
+}
+
+/* Keep current layout on tablets/mobile */
+@media (max-width: 900px) {
+  .quiz-layout {
+    display: block;
+  }
+
+  .quiz-left {
+    width: 100%;
+  }
+
+  .image-wrapper {
+    text-align: center;
+    margin: 12px auto 16px;
+    max-width: 540px;
+  }
+}

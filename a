@@ -1,0 +1,76 @@
+git add . && git commit -m "update files" && git push
+
+
+
+
+
+
+
+
+
+
+
+
+
+I want you to create CSV rows for my physics quiz app.
+
+My app uses this CSV format:
+
+id;question;a;b;c;d;correct;image
+
+Rules:
+1. Separator is semicolon ;
+2. Each question must be exactly one line.
+3. Do not put semicolons inside question text or answers, because my code uses line.split(";").
+4. If a question has no image, leave the image column empty.
+5. If a question has a main image, write it like:
+   question_images/201.png
+6. If the answer options are images, put the image paths inside a/b/c/d like:
+   question_images/226_1.png
+   question_images/226_2.png
+   question_images/226_3.png
+   question_images/226_4.png
+7. If both the question and answer options have images, use both.
+8. Use Armenian text exactly, but clean OCR line-break mistakes such as:
+   համա-կարգում → համակարգում
+   ազդե-ցությունները → ազդեցությունները
+9. Keep Armenian punctuation clean.
+10. The correct column must contain only the correct answer number: 1, 2, 3, or 4.
+11. Output only CSV format.
+12. Do not explain anything before or after the CSV.
+13. Do not use markdown code blocks.
+14. Include the header row:
+   id;question;a;b;c;d;correct;image
+
+I will give you these inputs:
+
+A) My app code / ZIP
+Use it only to understand how my CSV is loaded and how images are handled.
+
+B) images.txt
+This is the list of all available files inside question_images.
+Use it to decide whether a question has:
+- main image: question_images/ID.png
+- option images: question_images/ID_1.png, question_images/ID_2.png, question_images/ID_3.png, question_images/ID_4.png
+
+C) Question page image
+This is the original page from the physics book.
+Use it to verify formatting and missing parts.
+
+D) OCR text from Google
+This is the main source for question text and answer choices.
+Clean it and convert it to CSV.
+
+E) Correct answer page image
+The correct answers will be given only as image format.
+Read the answer numbers from the image and use them in the correct column.
+
+Important:
+If a question is incomplete because options continue on the next page, do not invent missing options.
+If images.txt has images for IDs that are not in the OCR text, ignore them.
+If you are unsure whether an image belongs to a question, leave the image column empty.
+
+Now create only the CSV output.
+
+Here are the inputs:
+
