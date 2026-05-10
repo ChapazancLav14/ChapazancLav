@@ -1,3 +1,4 @@
+cd Desktop/Vache/Physics
 git add . && git commit -m "update files" && git push
 
 
