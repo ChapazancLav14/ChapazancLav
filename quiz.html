@@ -23,6 +23,9 @@
     </svg>
   </button>
 
+  <!-- 🔢 REAL CSV QUESTION ID -->
+  <div id="csv-question-id" class="csv-question-id">ID</div>
+
   <!-- 🧮 CALCULATOR TOGGLE -->
   <button class="calculator-toggle" onclick="toggleCalculator()">
     <img src="images/calculator.png" alt="Calculator" />
@@ -87,11 +90,18 @@
 
   </div>
 
-  <!-- 🔢 JUMP TO QUESTION -->
-  <div class="jump-container">
-    <input id="jumpInput" type="number" placeholder="1 - 125" />
-    <button onclick="jumpToQuestion()">Go</button>
-    <div id="jumpError" class="jump-error"></div>
+  <!-- 🔢 QUESTION NAVIGATION + JUMP TO QUESTION -->
+  <div class="nav-jump-panel">
+    <div class="question-nav-buttons">
+      <button id="prevQuestionBtn" class="question-nav-btn" onclick="previousQuestion()" aria-label="Previous question">←</button>
+      <button id="skipQuestionBtn" class="question-nav-btn" onclick="skipQuestion()" aria-label="Skip to next question">→</button>
+    </div>
+
+    <div class="jump-container">
+      <input id="jumpInput" type="number" placeholder="1 - 125" />
+      <button onclick="jumpToQuestion()">Go</button>
+      <div id="jumpError" class="jump-error"></div>
+    </div>
   </div>
 
   <!-- ✅ FEEDBACK -->

@@ -71,6 +71,40 @@ onAuthStateChanged(auth, (user) => {
   if (user) saveResult(user);
 });
 
+function formatQuizTime(totalSeconds) {
+  totalSeconds = Number(totalSeconds) || 0;
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    if (minutes > 0 && seconds > 0) {
+      return `${hours} hr ${minutes} min ${seconds} sec`;
+    }
+
+    if (minutes > 0) {
+      return `${hours} hr ${minutes} min`;
+    }
+
+    if (seconds > 0) {
+      return `${hours} hr ${seconds} sec`;
+    }
+
+    return `${hours} hr`;
+  }
+
+  if (minutes > 0) {
+    if (seconds > 0) {
+      return `${minutes} min ${seconds} sec`;
+    }
+
+    return `${minutes} min`;
+  }
+
+  return `${seconds} sec`;
+}
+
 // ===============================
 // 🎯 UI UPDATE
 // ===============================
@@ -78,7 +112,7 @@ const circle = document.getElementById("circle");
 circle.style.setProperty("--percent", percent + "%");
 
 document.getElementById("percent").innerText = percent + "%";
-document.getElementById("time").innerText = resultData.time + " sec";
+document.getElementById("time").innerText = formatQuizTime(resultData.time);
 let correctCount = 0;
 let wrongCount = 0;
 let partialCount = 0;

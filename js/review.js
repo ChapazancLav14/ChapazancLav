@@ -1,3 +1,6 @@
+import { formatMath } from "./mathFormatter.js";
+import { isImagePath } from "./csvParser.js";
+
 // ===============================
 // 📦 LOAD DATA
 // ===============================
@@ -18,10 +21,25 @@ window.goBack = function () {
 // ===============================
 // ❓ QUESTION
 // ===============================
-document.getElementById("question").innerText =
-  data.question.question;
+const questionEl = document.getElementById("question");
+questionEl.innerHTML = formatMath(data.question.question);
 
 const container = document.getElementById("answers");
+
+function renderAnswerContent(target, answerText) {
+  const text = String(answerText ?? "").trim();
+
+  if (isImagePath(text)) {
+    const img = document.createElement("img");
+    img.src = text;
+    img.alt = "Answer option";
+    img.className = "review-answer-image";
+    target.appendChild(img);
+    return;
+  }
+
+  target.innerHTML = formatMath(text);
+}
 
 // ===============================
 // 🧠 STATUS (FINAL LOGIC)
@@ -31,12 +49,12 @@ function getQuestionStatus(qData) {
     return "unanswered";
   }
 
-  const hasCorrect = qData.attempts.some(a => a.isCorrect);
-  const hasWrong = qData.attempts.some(a => !a.isCorrect);
+  const hasCorrect = qData.attempts.some((a) => a.isCorrect);
+  const hasWrong = qData.attempts.some((a) => !a.isCorrect);
 
-  if (hasCorrect && hasWrong) return "partial"; // 🟠 ԹԵՐԻ
-  if (hasCorrect) return "correct";             // ✅
-  return "wrong";                               // ❌
+  if (hasCorrect && hasWrong) return "partial";
+  if (hasCorrect) return "correct";
+  return "wrong";
 }
 
 const status = getQuestionStatus(data);
@@ -51,7 +69,7 @@ data.attempts.forEach((attempt, index) => {
 
   if (!grouped[key]) {
     grouped[key] = {
-      tries: []
+      tries: [],
     };
   }
 
@@ -63,7 +81,6 @@ data.attempts.forEach((attempt, index) => {
 // ===============================
 const correctIndex = data.attempts[0].correctIndex;
 
-// 👉 If NOT partial → still show 1 block
 const keysToRender =
   status === "partial"
     ? Object.keys(grouped)
@@ -76,24 +93,21 @@ keysToRender.forEach((key) => {
   const block = document.createElement("div");
   block.className = "review-block";
 
-  // 🏷 title
   const title = document.createElement("div");
   title.className = "attempt-title";
   title.innerText = "Փորձ " + tries.join(",");
   block.appendChild(title);
 
-  // 🔢 SHOW ALL 4 ANSWERS
   data.question.answers.forEach((ans, i) => {
     const div = document.createElement("div");
     div.className = "review-answer";
-    div.innerText = ans.text;
 
-    // ✅ correct answer
+    renderAnswerContent(div, ans.text);
+
     if (i === correctIndex) {
       div.classList.add("review-correct");
     }
 
-    // ❌ selected wrong
     if (i === selectedIndex && i !== correctIndex) {
       div.classList.add("review-wrong");
     }

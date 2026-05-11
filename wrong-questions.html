@@ -1,0 +1,36 @@
+<!--wrong-questions.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wrong Questions</title>
+  <link rel="icon" type="image/png" href="images/icon.png">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/wrong-questions.css">
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">
+    <svg class="back-icon" viewBox="0 0 24 24">
+      <path d="M15 18L9 12L15 6"></path>
+    </svg>
+  </button>
+
+  <main class="wrong-page">
+    <section class="wrong-hero">
+      <p class="eyebrow">All-time wrong questions</p>
+      <h1>Սխալ պատասխանված հարցեր</h1>
+      <p class="wrong-description">
+        Այստեղ երևում են բոլոր հարցերը, որոնց գոնե մեկ անգամ սխալ ես պատասխանել։
+      </p>
+      <strong id="wrongTotal" class="wrong-total">0</strong>
+    </section>
+
+    <div id="wrongGrid" class="wrong-grid"></div>
+    <p id="wrongEmpty" class="wrong-empty" hidden>Դեռ սխալ պատասխանված հարցեր չկան։</p>
+  </main>
+
+  <script type="module" src="js/wrong-questions.js"></script>
+</body>
+</html>
