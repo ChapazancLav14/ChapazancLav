@@ -202,6 +202,11 @@ function renderMonthBoxes(activeDays) {
   monthLabel.innerText = monthName + " " + year;
 }
 
+function formatDisplayDate(dateString) {
+  const [year, month, day] = dateString.split("-");
+  return `${month}-${day}-${year}`;
+}
+
 window.openDayModal = async function (dateStr) {
   const user = auth.currentUser;
   if (!user) return;
@@ -211,7 +216,7 @@ window.openDayModal = async function (dateStr) {
 
   const data = snap.exists() ? snap.data() : {};
 
-  document.getElementById("dayModalTitle").innerText = dateStr;
+  document.getElementById("dayModalTitle").innerText = formatDisplayDate(dateStr);
   document.getElementById("dayTotal").innerText = data.total || 0;
   document.getElementById("dayCorrect").innerText = data.correct || 0;
   document.getElementById("dayWrong").innerText = data.wrong || 0;
